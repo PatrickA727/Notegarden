@@ -12,7 +12,11 @@ export const NOTES = ["A", "A#", "Bb", "B", "C", "C#", "Db", "D", "D#", "Eb", "E
 const ENHARMONIC: Record<string, string> = {
   "Bb": "A#", "Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#"
 }
+const SHARP_TO_FLAT: Record<string, string> = Object.fromEntries(
+  Object.entries(ENHARMONIC).map(([flat, sharp]) => [sharp, flat])
+)
 export const toSharp = (note: string): string => ENHARMONIC[note] ?? note;
+export const toFlat = (note: string): string | null => SHARP_TO_FLAT[note] ?? null;
 export const STRINGS = ["E (high)", "B", "G", "D", "A", "E (low)"]
 
 

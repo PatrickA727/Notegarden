@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from './ui/input';
-import { toSharp } from "@/lib/utils";
+import { toSharp, toFlat } from "@/lib/utils";
 
 interface NoteRecogProps {
   note: string
@@ -12,10 +12,13 @@ const NoteRecogMain = ({ note, randomize }: NoteRecogProps) => {
   const [userInput, setUserInput] = useState('');
 
   const handleSubmit = () => {
-    if (toSharp(userInput.toUpperCase()) === note) {
-        alert("Correct! The note is " + note);
+    const normalized = userInput.charAt(0).toUpperCase() + userInput.slice(1).toLowerCase();
+    const flat = toFlat(note);
+    const noteDisplay = flat ? `${note}/${flat}` : note;
+    if (toSharp(normalized) === note) {
+        alert("Correct! The note is " + noteDisplay);
     } else {
-        alert("Incorrect. The correct note is " + note);
+        alert("Incorrect. The correct note is " + noteDisplay);
     }
     setUserInput('');
     randomize();
