@@ -83,6 +83,7 @@ const GuitarNotes = () => {
                   setActiveStrings={setActiveStrings}
                   randomize={randomize}
                   position={position}
+                  sweepRandomize={sweepRandomize}
                   />
                 </div>
             </div>

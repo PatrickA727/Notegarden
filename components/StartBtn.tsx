@@ -12,9 +12,10 @@ interface StartButtonProps {
   setActiveStrings: React.Dispatch<React.SetStateAction<boolean[]>>
   randomize: () => void
   position: string
+  sweepRandomize: () => void
 }
 
-const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings, randomize, position }: StartButtonProps) => {
+const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings, randomize, position, sweepRandomize }: StartButtonProps) => {
   useEffect(() => {
     if (isRunning && mode === "identify") {
       setHighlighted({ [position]: true });
@@ -31,6 +32,8 @@ const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings,
         setActiveStrings(Array(6).fill(true));
       } else if (mode === "identify") {
         randomize();
+      } else if (mode === "sweep") {
+        sweepRandomize();
       }
     }
   }
