@@ -19,9 +19,11 @@ interface FretboardProps {
   onSweepFretClick?: (si: number, fi: number) => void
   flashFret?: { key: string; correct: boolean } | null
   sweepTargetSi?: number
+  onCollectorFretClick?: (si: number, fi: number) => void
+  collectorFlashFret?: { key: string; correct: boolean } | null
 }
 
-const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings, setActiveStrings, onSweepFretClick, flashFret, sweepTargetSi }: FretboardProps) => {
+const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings, setActiveStrings, onSweepFretClick, flashFret, sweepTargetSi, onCollectorFretClick, collectorFlashFret }: FretboardProps) => {
   const toggleString = (si: number) => {
     if (isRunning && mode === "collector") {
       setActiveStrings(Array(6).fill(true));
@@ -122,7 +124,8 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                     const isClickable = isActive && (
                       !isRunning ||
                       (isRunning && mode === "locate") ||
-                      (isRunning && mode === "sweep" && !isSweepInactive)
+                      (isRunning && mode === "sweep" && !isSweepInactive) ||
+                      (isRunning && mode === "collector")
                     );
                     return (
                       <div
@@ -137,6 +140,8 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                             toggleLocateNoteFret(si, fi)
                           } else if (isRunning && mode === "sweep" && !isSweepInactive) {
                             onSweepFretClick?.(si, fi)
+                          } else if (isRunning && mode === "collector") {
+                            onCollectorFretClick?.(si, fi)
                           }
                         }}
                       >
@@ -185,6 +190,16 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                           <div
                             className={`w-[26px] h-[26px] rounded-full flex items-center justify-center text-[10px] font-bold relative z-20 ${
                               flashFret.correct ? "bg-emerald-400 text-emerald-900" : "bg-red-400 text-red-900"
+                            }`}
+                            style={{ animation: "fbpop .14s ease" }}
+                          />
+                        )}
+
+                        {/* Collector mode flash */}
+                        {isRunning && mode === "collector" && collectorFlashFret?.key === key && (
+                          <div
+                            className={`w-[26px] h-[26px] rounded-full flex items-center justify-center text-[10px] font-bold relative z-20 ${
+                              collectorFlashFret.correct ? "bg-emerald-400 text-emerald-900" : "bg-red-400 text-red-900"
                             }`}
                             style={{ animation: "fbpop .14s ease" }}
                           />

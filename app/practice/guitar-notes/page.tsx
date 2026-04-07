@@ -10,7 +10,7 @@ import Fretboard from "@/components/Fretboard"
 import { useState } from "react"
 import StartBtn from "@/components/StartBtn"
 import useNoteRecognitionGetNote from "@/hooks/useNoteRecognitionGetNote"
-import { NOTES, NOTES_FROM_OPEN, toSharp } from "@/lib/utils"
+import { NOTES, NOTES_FROM_OPEN, toSharp, random } from "@/lib/utils"
 
 const randomSweepNotes = (count: number): string[] => {
   const shuffled = [...NOTES].sort(() => Math.random() - 0.5)
@@ -31,6 +31,34 @@ const GuitarNotes = () => {
   const [highlighted, setHighlighted] = useState<Record<string, boolean>>({});
   const [activeStrings, setActiveStrings] = useState<boolean[]>(Array(6).fill(true));
   const { position, note, randomize } = useNoteRecognitionGetNote(activeStrings);
+
+  const [collectorNote, setCollectorNote] = useState<string>(() => random(NOTES))
+  const [collectorResults, setCollectorResults] = useState<(boolean | null)[]>(Array(6).fill(null))
+  const [collectorFlashFret, setCollectorFlashFret] = useState<{ key: string; correct: boolean } | null>(null)
+
+  const collectorRandomize = () => {
+    setCollectorNote(random(NOTES))
+    setCollectorResults(Array(6).fill(null))
+  }
+
+  const handleCollectorFretClick = (si: number, fi: number) => {
+    if (collectorResults[si] !== null) return
+    const clicked = toSharp(NOTES_FROM_OPEN[si][fi + 1])
+    const expected = toSharp(collectorNote)
+    const correct = clicked === expected
+    const key = `${si}-${fi}`
+
+    setCollectorFlashFret({ key, correct })
+    setTimeout(() => setCollectorFlashFret(null), 500)
+
+    const newResults = [...collectorResults]
+    newResults[si] = correct
+    setCollectorResults(newResults)
+
+    if (newResults.every(r => r !== null)) {
+      setTimeout(collectorRandomize, 1200)
+    }
+  }
 
   const [sweepNotes, setSweepNotes] = useState<string[]>(() => randomSweepNotes(5))
   const [sweepTargetSi, setSweepTargetSi] = useState<number>(() => Math.floor(Math.random() * 6))
@@ -84,6 +112,7 @@ const GuitarNotes = () => {
                   randomize={randomize}
                   position={position}
                   sweepRandomize={sweepRandomize}
+                  collectorRandomize={collectorRandomize}
                   />
                 </div>
             </div>
@@ -103,6 +132,8 @@ const GuitarNotes = () => {
             sweepTargetSi={sweepTargetSi}
             sweepStep={sweepStep}
             sweepResults={sweepResults}
+            collectorNote={collectorNote}
+            collectorResults={collectorResults}
             />
             <div className="pt-5">
               <Fretboard
@@ -115,6 +146,8 @@ const GuitarNotes = () => {
               onSweepFretClick={handleSweepFretClick}
               flashFret={flashFret}
               sweepTargetSi={sweepTargetSi}
+              onCollectorFretClick={handleCollectorFretClick}
+              collectorFlashFret={collectorFlashFret}
               />
             </div>
           </main>

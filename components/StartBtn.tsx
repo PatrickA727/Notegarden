@@ -13,9 +13,10 @@ interface StartButtonProps {
   randomize: () => void
   position: string
   sweepRandomize: () => void
+  collectorRandomize: () => void
 }
 
-const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings, randomize, position, sweepRandomize }: StartButtonProps) => {
+const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings, randomize, position, sweepRandomize, collectorRandomize }: StartButtonProps) => {
   useEffect(() => {
     if (isRunning && mode === "identify") {
       setHighlighted({ [position]: true });
@@ -30,6 +31,7 @@ const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings,
     if (newIsRunning) {
       if (mode === "collector") {
         setActiveStrings(Array(6).fill(true));
+        collectorRandomize();
       } else if (mode === "identify") {
         randomize();
       } else if (mode === "sweep") {

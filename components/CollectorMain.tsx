@@ -1,27 +1,33 @@
-import { useState } from "react"
-import { random, NOTES } from "@/lib/utils"
-import useRandomNoteString from "@/hooks/useRandomNoteString"
+import { STRINGS } from "@/lib/utils"
 
-const CollectorMain = () => {
-  // const { note, randomizeNote } = useRandomNoteString()
+interface CollectorMainProps {
+  note: string
+  results: (boolean | null)[]
+}
 
+const CollectorMain = ({ note, results }: CollectorMainProps) => {
   return (
     <div className="bg-zinc-800 border border-zinc-700 rounded-lg py-6 px-12">
       <p className="text-zinc-500 text-[13px] uppercase tracking-widest mb-4">
         Find this note on every string
       </p>
-      <div className="flex items-center justify-center">
-        <div className="flex items-center gap-6">
-          <div>
-            <p className="text-white text-6xl font-semibold">{}</p>
-          </div>
+      <div className="flex items-center gap-10">
+        <p className="text-white text-6xl font-semibold">{note}</p>
+        <div className="w-px h-14 bg-zinc-700" />
+        <div className="flex items-center gap-5">
+          {STRINGS.map((name, si) => {
+            const result = results[si]
+            const color =
+              result === true ? "text-emerald-400" :
+              result === false ? "text-red-400" :
+              "text-zinc-500"
+            return (
+              <div key={si} className="flex flex-col items-center gap-1">
+                <p className={`text-sm font-semibold transition-colors ${color}`}>{name}</p>
+              </div>
+            )
+          })}
         </div>
-        {/* <button
-          onClick={randomizeNote}
-          className="text-zinc-600 hover:text-zinc-400 text-[12px] uppercase tracking-widest transition-colors duration-200"
-        >
-          Enter
-        </button> */}
       </div>
     </div>
   )
