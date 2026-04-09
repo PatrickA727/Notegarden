@@ -31,12 +31,21 @@ const GuitarNotes = () => {
   const [highlighted, setHighlighted] = useState<Record<string, boolean>>({});
   const [activeStrings, setActiveStrings] = useState<boolean[]>(Array(6).fill(true));
   const { position, note, randomize } = useNoteRecognitionGetNote(activeStrings);
+  
   const [identifyAttempts, setIdentifyAttempts] = useState(0);
   const [identifyCorrect, setIdentifyCorrect] = useState(0);
 
   const handleIdentifyAnswer = (isCorrect: boolean) => {
     setIdentifyAttempts(prev => prev + 1);
     if (isCorrect) setIdentifyCorrect(prev => prev + 1);
+  }
+
+  const [locateAttempts, setLocateAttempts] = useState(0);
+  const [locateCorrect, setLocateCorrect] = useState(0);
+
+  const handleLocateAnswer = (isCorrect: boolean) => {
+    setLocateAttempts(prev => prev + 1);
+    if (isCorrect) setLocateCorrect(prev => prev + 1);
   }
 
   const [collectorNote, setCollectorNote] = useState<string>(() => random(NOTES))
@@ -142,6 +151,7 @@ const GuitarNotes = () => {
             collectorNote={collectorNote}
             collectorResults={collectorResults}
             onIdentifyAnswer={handleIdentifyAnswer}
+            onLocateAnswer={handleLocateAnswer}
             />
             <div className="pt-5">
               <Fretboard
@@ -162,7 +172,7 @@ const GuitarNotes = () => {
 
           <aside className="w-80 bg-zinc-950 text-white flex justify-center pt-20">
             <div className="w-70">
-              <Statistics identifyAttempts={identifyAttempts} identifyCorrect={identifyCorrect} />
+              <Statistics activeMode={activeMode} identifyAttempts={identifyAttempts} identifyCorrect={identifyCorrect} locateAttempts={locateAttempts} locateCorrect={locateCorrect} />
               <StringAcc></StringAcc>
             </div>
           </aside>

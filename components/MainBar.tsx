@@ -20,9 +20,10 @@ interface MainBarProps {
   collectorNote: string
   collectorResults: (boolean | null)[]
   onIdentifyAnswer: (isCorrect: boolean) => void
+  onLocateAnswer: (isCorrect: boolean) => void
 }
 
-const MainBar = ({ mode, isRunning, position, note, randomize, highlighted, setHighlighted, activeStrings, sweepNotes, sweepTargetSi, sweepStep, sweepResults, collectorNote, collectorResults, onIdentifyAnswer }: MainBarProps) => {
+const MainBar = ({ mode, isRunning, position, note, randomize, highlighted, setHighlighted, activeStrings, sweepNotes, sweepTargetSi, sweepStep, sweepResults, collectorNote, collectorResults, onIdentifyAnswer, onLocateAnswer }: MainBarProps) => {
   if (!isRunning) return (
     <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-6">
       <h2 className="text-white text-2xl font-bold mb-3 px-1 tracking-wide">
@@ -35,7 +36,7 @@ const MainBar = ({ mode, isRunning, position, note, randomize, highlighted, setH
   )
 
   if (mode === "identify") return <NoteRecogMain key={position} note={note} randomize={randomize} onAnswer={onIdentifyAnswer} />
-  if (mode === "locate") return <LocateNoteMain highlighted={highlighted} setHighlighted={setHighlighted} activeStrings={activeStrings} />
+  if (mode === "locate") return <LocateNoteMain highlighted={highlighted} setHighlighted={setHighlighted} activeStrings={activeStrings} onAnswer={onLocateAnswer} />
   if (mode === "sweep") return <SweepMain notes={sweepNotes} targetSi={sweepTargetSi} step={sweepStep} results={sweepResults} />
   if (mode === "collector") return <CollectorMain note={collectorNote} results={collectorResults} />
 }

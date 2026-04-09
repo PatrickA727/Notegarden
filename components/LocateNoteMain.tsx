@@ -1,3 +1,4 @@
+import { useState } from "react"
 import useRandomNoteString from "@/hooks/useRandomNoteString"
 import { NOTES_FROM_OPEN, STRINGS, toSharp } from "@/lib/utils"
 
@@ -5,10 +6,12 @@ interface LocateNoteMainProps {
   highlighted: Record<string, boolean>
   setHighlighted: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   activeStrings: boolean[]
+  onAnswer: (isCorrect: boolean) => void
 }
 
-const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings }: LocateNoteMainProps) => {
+const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, onAnswer }: LocateNoteMainProps) => {
   const { note, string, randomizeNote, randomizeString } = useRandomNoteString(activeStrings);
+  const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
 
   const handleEnter = () => {
     const key = Object.keys(highlighted)[0];
@@ -17,16 +20,17 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings }: LocateNo
     const [si, fi] = key.split("-").map(Number);
     const selectedNote = NOTES_FROM_OPEN[si][fi + 1];
     const selectedString = STRINGS[si];
-    
+
     const isCorrect = toSharp(selectedNote) === toSharp(note) && selectedString === string;
+    onAnswer(isCorrect);
+    setResult(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      alert("Correct!");
       randomizeNote();
       randomizeString();
       setHighlighted({});
+      setResult(null);
     } else {
-      alert(`Incorrect! The correct answer is ${note} on the ${string} string.`);
       const correctSi = STRINGS.indexOf(string);
       const correctFretIndex = NOTES_FROM_OPEN[correctSi].findIndex((n, i) => i > 0 && n === toSharp(note));
       const correctFi = correctFretIndex - 1;
@@ -35,6 +39,7 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings }: LocateNo
         randomizeNote();
         randomizeString();
         setHighlighted({});
+        setResult(null);
       }, 1500);
     }
   }
@@ -64,6 +69,11 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings }: LocateNo
           Enter
         </button>
       </div>
+      {result && (
+        <p className={`text-sm mt-4 ${result === 'correct' ? 'text-green-400' : 'text-red-400'}`}>
+          {result === 'correct' ? 'Correct!' : `Incorrect! The correct answer is ${note} on the ${string} string.`}
+        </p>
+      )}
     </div>
   )
 }

@@ -1,16 +1,25 @@
 
 
 import { BarChart2, Clock, Zap, Award } from "lucide-react"
+import { type PracticeMode } from "@/types"
 
 interface StatisticsProps {
+  activeMode: PracticeMode
   identifyAttempts: number
   identifyCorrect: number
+  locateAttempts: number
+  locateCorrect: number
 }
 
-const Statistics = ({ identifyAttempts, identifyCorrect }: StatisticsProps) => {
-  const accuracyDisplay = identifyAttempts === 0
-    ? '--'
-    : `${Math.round((identifyCorrect / identifyAttempts) * 100)}`
+const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, locateAttempts, locateCorrect }: StatisticsProps) => {
+  const getAccuracyDisplay = () => {
+    if (activeMode === 'identify')
+      return identifyAttempts === 0 ? '--' : `${Math.round((identifyCorrect / identifyAttempts) * 100)} %`
+    if (activeMode === 'locate')
+      return locateAttempts === 0 ? '--' : `${Math.round((locateCorrect / locateAttempts) * 100)} %`
+    return '--'
+  }
+  const accuracyDisplay = getAccuracyDisplay()
   const avgTime = "12"
   const streak = "5"
   const bestStreak = "10"
@@ -28,7 +37,7 @@ const Statistics = ({ identifyAttempts, identifyCorrect }: StatisticsProps) => {
             <BarChart2 className="w-4 h-4" />
             <span>Accuracy</span>
           </div>
-          <span className="text-white text-lg font-semibold">{accuracyDisplay}{identifyAttempts > 0 ? ' %' : ''}</span>
+          <span className="text-white text-lg font-semibold">{accuracyDisplay}</span>
         </div>
 
         {/* Avg Time */}
