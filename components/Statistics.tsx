@@ -2,9 +2,15 @@
 
 import { BarChart2, Clock, Zap, Award } from "lucide-react"
 
-const Statistics = () => {
-  // dummy values for now
-  const accuracy = "67"
+interface StatisticsProps {
+  identifyAttempts: number
+  identifyCorrect: number
+}
+
+const Statistics = ({ identifyAttempts, identifyCorrect }: StatisticsProps) => {
+  const accuracyDisplay = identifyAttempts === 0
+    ? '--'
+    : `${Math.round((identifyCorrect / identifyAttempts) * 100)}`
   const avgTime = "12"
   const streak = "5"
   const bestStreak = "10"
@@ -22,7 +28,7 @@ const Statistics = () => {
             <BarChart2 className="w-4 h-4" />
             <span>Accuracy</span>
           </div>
-          <span className="text-white text-lg font-semibold">{accuracy} %</span>
+          <span className="text-white text-lg font-semibold">{accuracyDisplay}{identifyAttempts > 0 ? ' %' : ''}</span>
         </div>
 
         {/* Avg Time */}

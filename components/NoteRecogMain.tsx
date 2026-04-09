@@ -6,23 +6,24 @@ import { toSharp, toFlat } from "@/lib/utils";
 interface NoteRecogProps {
   note: string
   randomize: () => void
+  onAnswer: (isCorrect: boolean) => void
 }
 
-const NoteRecogMain = ({ note, randomize }: NoteRecogProps) => {
+const NoteRecogMain = ({ note, randomize, onAnswer }: NoteRecogProps) => {
   const [userInput, setUserInput] = useState('');
+  const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
 
   const handleSubmit = () => {
     const normalized = userInput.charAt(0).toUpperCase() + userInput.slice(1).toLowerCase();
-    const flat = toFlat(note);
-    const noteDisplay = flat ? `${note}/${flat}` : note;
-    if (toSharp(normalized) === note) {
-        alert("Correct! The note is " + noteDisplay);
-    } else {
-        alert("Incorrect. The correct note is " + noteDisplay);
-    }
+    const isCorrect = toSharp(normalized) === note;
+    onAnswer(isCorrect);
+    setResult(isCorrect ? 'correct' : 'incorrect');
     setUserInput('');
-    randomize();
+    setTimeout(randomize, 1000);
   }
+
+  const flat = toFlat(note);
+  const noteDisplay = flat ? `${note}/${flat}` : note;
 
     return (
         <div className="bg-zinc-800 border border-zinc-700 rounded-lg py-6 px-12">
@@ -45,6 +46,11 @@ const NoteRecogMain = ({ note, randomize }: NoteRecogProps) => {
                     Enter
                 </Button>
             </div>
+            {result && (
+              <p className={`text-sm mt-3 ${result === 'correct' ? 'text-green-400' : 'text-red-400'}`}>
+                {result === 'correct' ? `Correct! The note is ${noteDisplay}` : `Incorrect. The correct note is ${noteDisplay}`}
+              </p>
+            )}
         </div>
     )
 }
