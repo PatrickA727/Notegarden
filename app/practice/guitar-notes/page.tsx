@@ -57,6 +57,9 @@ const GuitarNotes = () => {
     setCollectorResults(Array(6).fill(null))
   }
 
+  const [collectorAttempts, setCollectorAttempts] = useState(0);
+  const [collectorCorrect, setCollectorCorrect] = useState(0);
+
   const handleCollectorFretClick = (si: number, fi: number) => {
     if (collectorResults[si] !== null) return
     const clicked = toSharp(NOTES_FROM_OPEN[si][fi + 1])
@@ -66,6 +69,9 @@ const GuitarNotes = () => {
 
     setCollectorFlashFret({ key, correct })
     setTimeout(() => setCollectorFlashFret(null), 500)
+
+    if (correct) setCollectorCorrect(prev => prev + 1)
+    setCollectorAttempts(prev => prev + 1)
 
     const newResults = [...collectorResults]
     newResults[si] = correct
@@ -186,6 +192,8 @@ const GuitarNotes = () => {
               locateCorrect={locateCorrect}
               sweepAttempts={sweepAttempts}
               sweepCorrect={sweepCorrect}
+              collectorAttempts={collectorAttempts}
+              collectorCorrect={collectorCorrect}
               />
               <StringAcc></StringAcc>
             </div>

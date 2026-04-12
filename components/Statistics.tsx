@@ -11,9 +11,11 @@ interface StatisticsProps {
   locateCorrect: number
   sweepAttempts: number
   sweepCorrect: number
+  collectorAttempts: number
+  collectorCorrect: number
 }
 
-const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, locateAttempts, locateCorrect, sweepAttempts, sweepCorrect }: StatisticsProps) => {
+const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, locateAttempts, locateCorrect, sweepAttempts, sweepCorrect, collectorAttempts, collectorCorrect }: StatisticsProps) => {
   const getAccuracyDisplay = () => {
     if (activeMode === 'identify')
       return identifyAttempts === 0 ? '--' : `${Math.round((identifyCorrect / identifyAttempts) * 100)} %`
@@ -21,6 +23,8 @@ const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, locateAttem
       return locateAttempts === 0 ? '--' : `${Math.round((locateCorrect / locateAttempts) * 100)} %`
     if (activeMode === 'sweep')      
       return sweepAttempts === 0 ? '--' : `${Math.round((sweepCorrect / sweepAttempts) * 100)} %`
+    if (activeMode === 'collector')
+      return collectorAttempts === 0 ? '--' : `${Math.round((collectorCorrect / collectorAttempts) * 100)} %`
     return '--'
   }
   const accuracyDisplay = getAccuracyDisplay()
