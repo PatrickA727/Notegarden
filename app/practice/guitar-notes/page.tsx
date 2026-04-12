@@ -89,6 +89,9 @@ const GuitarNotes = () => {
     setSweepResults(Array(5).fill(null))
   }
 
+  const [sweepAttempts, setSweepAttempts] = useState(0);
+  const [sweepCorrect, setSweepCorrect] = useState(0);
+
   const handleSweepFretClick = (si: number, fi: number) => {
     if (si !== sweepTargetSi || sweepStep >= 5) return
     const clicked = toSharp(NOTES_FROM_OPEN[si][fi + 1])
@@ -102,6 +105,9 @@ const GuitarNotes = () => {
     const newResults = [...sweepResults]
     newResults[sweepStep] = correct
     setSweepResults(newResults)
+
+    if (correct) setSweepCorrect(prev => prev + 1)
+    setSweepAttempts(prev => prev + 1)
 
     if (sweepStep === 4) {
       setSweepStep(5)
@@ -172,7 +178,15 @@ const GuitarNotes = () => {
 
           <aside className="w-80 bg-zinc-950 text-white flex justify-center pt-20">
             <div className="w-70">
-              <Statistics activeMode={activeMode} identifyAttempts={identifyAttempts} identifyCorrect={identifyCorrect} locateAttempts={locateAttempts} locateCorrect={locateCorrect} />
+              <Statistics 
+              activeMode={activeMode} 
+              identifyAttempts={identifyAttempts} 
+              identifyCorrect={identifyCorrect} 
+              locateAttempts={locateAttempts} 
+              locateCorrect={locateCorrect}
+              sweepAttempts={sweepAttempts}
+              sweepCorrect={sweepCorrect}
+              />
               <StringAcc></StringAcc>
             </div>
           </aside>
