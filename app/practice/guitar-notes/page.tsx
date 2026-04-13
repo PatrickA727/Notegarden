@@ -34,8 +34,14 @@ const GuitarNotes = () => {
   
   const [identifyAttempts, setIdentifyAttempts] = useState(0);
   const [identifyCorrect, setIdentifyCorrect] = useState(0);
+  const [identifyTimerStart, setIdentifyTimerStart] = useState<number | null>(null);
+  const [identifyTotalTime, setIdentifyTotalTime] = useState(0);
 
   const handleIdentifyAnswer = (isCorrect: boolean) => {
+    if (identifyTimerStart !== null) {
+      setIdentifyTotalTime(prev => prev + (Date.now() - identifyTimerStart));
+    }
+    setIdentifyTimerStart(Date.now());
     setIdentifyAttempts(prev => prev + 1);
     if (isCorrect) setIdentifyCorrect(prev => prev + 1);
   }
@@ -141,6 +147,7 @@ const GuitarNotes = () => {
                   position={position}
                   sweepRandomize={sweepRandomize}
                   collectorRandomize={collectorRandomize}
+                  startIdentifyTimer={() => setIdentifyTimerStart(Date.now())}
                   />
                 </div>
             </div>
@@ -184,11 +191,12 @@ const GuitarNotes = () => {
 
           <aside className="w-80 bg-zinc-950 text-white flex justify-center pt-20">
             <div className="w-70">
-              <Statistics 
-              activeMode={activeMode} 
-              identifyAttempts={identifyAttempts} 
-              identifyCorrect={identifyCorrect} 
-              locateAttempts={locateAttempts} 
+              <Statistics
+              activeMode={activeMode}
+              identifyAttempts={identifyAttempts}
+              identifyCorrect={identifyCorrect}
+              identifyTotalTime={identifyTotalTime}
+              locateAttempts={locateAttempts}
               locateCorrect={locateCorrect}
               sweepAttempts={sweepAttempts}
               sweepCorrect={sweepCorrect}

@@ -7,6 +7,7 @@ interface StatisticsProps {
   activeMode: PracticeMode
   identifyAttempts: number
   identifyCorrect: number
+  identifyTotalTime: number
   locateAttempts: number
   locateCorrect: number
   sweepAttempts: number
@@ -15,7 +16,7 @@ interface StatisticsProps {
   collectorCorrect: number
 }
 
-const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, locateAttempts, locateCorrect, sweepAttempts, sweepCorrect, collectorAttempts, collectorCorrect }: StatisticsProps) => {
+const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTotalTime, locateAttempts, locateCorrect, sweepAttempts, sweepCorrect, collectorAttempts, collectorCorrect }: StatisticsProps) => {
   const getAccuracyDisplay = () => {
     if (activeMode === 'identify')
       return identifyAttempts === 0 ? '--' : `${Math.round((identifyCorrect / identifyAttempts) * 100)} %`
@@ -28,7 +29,12 @@ const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, locateAttem
     return '--'
   }
   const accuracyDisplay = getAccuracyDisplay()
-  const avgTime = "12"
+  const getAvgTimeDisplay = () => {
+    if (activeMode === 'identify')
+      return identifyAttempts === 0 ? '--' : `${(identifyTotalTime / identifyAttempts / 1000).toFixed(1)}`
+    return '--'
+  }
+  const avgTimeDisplay = getAvgTimeDisplay()
   const streak = "5"
   const bestStreak = "10"
 
@@ -54,7 +60,7 @@ const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, locateAttem
             <Clock className="w-4 h-4" />
             <span>Avg Time</span>
           </div>
-          <span className="text-white text-lg font-semibold">{avgTime} s</span>
+          <span className="text-white text-lg font-semibold">{avgTimeDisplay}{avgTimeDisplay !== '--' ? ' s' : ''}</span>
         </div>
 
         {/* Streak */}
