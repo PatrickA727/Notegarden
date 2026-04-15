@@ -34,6 +34,7 @@ const GuitarNotes = () => {
   
   const [identifyAttempts, setIdentifyAttempts] = useState(0);
   const [identifyCorrect, setIdentifyCorrect] = useState(0);
+
   const [identifyTimerStart, setIdentifyTimerStart] = useState<number | null>(null);
   const [identifyTotalTime, setIdentifyTotalTime] = useState(0);
 
@@ -41,7 +42,6 @@ const GuitarNotes = () => {
     if (identifyTimerStart !== null) {
       setIdentifyTotalTime(prev => prev + (Date.now() - identifyTimerStart));
     }
-    setIdentifyTimerStart(Date.now());
     setIdentifyAttempts(prev => prev + 1);
     if (isCorrect) setIdentifyCorrect(prev => prev + 1);
   }
@@ -49,7 +49,13 @@ const GuitarNotes = () => {
   const [locateAttempts, setLocateAttempts] = useState(0);
   const [locateCorrect, setLocateCorrect] = useState(0);
 
+  const [locateTimerStart, setLocateTimerStart] = useState<number | null>(null);
+  const [locateTotalTime, setLocateTotalTime] = useState(0);
+
   const handleLocateAnswer = (isCorrect: boolean) => {
+    if (locateTimerStart !== null) {
+      setLocateTotalTime(prev => prev + (Date.now() - locateTimerStart));
+    }
     setLocateAttempts(prev => prev + 1);
     if (isCorrect) setLocateCorrect(prev => prev + 1);
   }
@@ -170,7 +176,9 @@ const GuitarNotes = () => {
             collectorNote={collectorNote}
             collectorResults={collectorResults}
             onIdentifyAnswer={handleIdentifyAnswer}
+            onIdentifyTimerRestart={() => setIdentifyTimerStart(Date.now())}
             onLocateAnswer={handleLocateAnswer}
+            onLocateTimerRestart={() => setLocateTimerStart(Date.now())}
             />
             <div className="pt-5">
               <Fretboard
@@ -198,6 +206,7 @@ const GuitarNotes = () => {
               identifyTotalTime={identifyTotalTime}
               locateAttempts={locateAttempts}
               locateCorrect={locateCorrect}
+              locateTotalTime={locateTotalTime}
               sweepAttempts={sweepAttempts}
               sweepCorrect={sweepCorrect}
               collectorAttempts={collectorAttempts}

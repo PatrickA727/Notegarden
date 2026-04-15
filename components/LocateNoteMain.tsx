@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import useRandomNoteString from "@/hooks/useRandomNoteString"
 import { NOTES_FROM_OPEN, STRINGS, toSharp } from "@/lib/utils"
 
@@ -7,11 +7,16 @@ interface LocateNoteMainProps {
   setHighlighted: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   activeStrings: boolean[]
   onAnswer: (isCorrect: boolean) => void
+  onTimerRestart: () => void
 }
 
-const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, onAnswer }: LocateNoteMainProps) => {
+const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, onAnswer, onTimerRestart }: LocateNoteMainProps) => {
   const { note, string, randomizeNote, randomizeString } = useRandomNoteString(activeStrings);
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
+
+  useEffect(() => {
+    onTimerRestart();
+  }, []);
 
   const handleEnter = () => {
     const key = Object.keys(highlighted)[0];
@@ -30,6 +35,7 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, onAnswer }
       randomizeString();
       setHighlighted({});
       setResult(null);
+      onTimerRestart();
     } else {
       const correctSi = STRINGS.indexOf(string);
       const correctFretIndex = NOTES_FROM_OPEN[correctSi].findIndex((n, i) => i > 0 && n === toSharp(note));
@@ -40,6 +46,7 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, onAnswer }
         randomizeString();
         setHighlighted({});
         setResult(null);
+        onTimerRestart();
       }, 1500);
     }
   }

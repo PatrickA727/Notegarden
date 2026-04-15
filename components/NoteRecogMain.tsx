@@ -7,9 +7,10 @@ interface NoteRecogProps {
   note: string
   randomize: () => void
   onAnswer: (isCorrect: boolean) => void
+  onTimerRestart: () => void
 }
 
-const NoteRecogMain = ({ note, randomize, onAnswer }: NoteRecogProps) => {
+const NoteRecogMain = ({ note, randomize, onAnswer, onTimerRestart }: NoteRecogProps) => {
   const [userInput, setUserInput] = useState('');
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
 
@@ -19,7 +20,7 @@ const NoteRecogMain = ({ note, randomize, onAnswer }: NoteRecogProps) => {
     onAnswer(isCorrect);
     setResult(isCorrect ? 'correct' : 'incorrect');
     setUserInput('');
-    setTimeout(randomize, 1000);
+    setTimeout(() => { randomize(); onTimerRestart(); }, 1000);
   }
 
   const flat = toFlat(note);

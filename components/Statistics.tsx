@@ -10,13 +10,14 @@ interface StatisticsProps {
   identifyTotalTime: number
   locateAttempts: number
   locateCorrect: number
+  locateTotalTime: number
   sweepAttempts: number
   sweepCorrect: number
   collectorAttempts: number
   collectorCorrect: number
 }
 
-const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTotalTime, locateAttempts, locateCorrect, sweepAttempts, sweepCorrect, collectorAttempts, collectorCorrect }: StatisticsProps) => {
+const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTotalTime, locateAttempts, locateCorrect, locateTotalTime, sweepAttempts, sweepCorrect, collectorAttempts, collectorCorrect }: StatisticsProps) => {
   const getAccuracyDisplay = () => {
     if (activeMode === 'identify')
       return identifyAttempts === 0 ? '--' : `${Math.round((identifyCorrect / identifyAttempts) * 100)} %`
@@ -32,6 +33,8 @@ const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTot
   const getAvgTimeDisplay = () => {
     if (activeMode === 'identify')
       return identifyAttempts === 0 ? '--' : `${(identifyTotalTime / identifyAttempts / 1000).toFixed(1)}`
+    if (activeMode === 'locate')
+      return locateAttempts === 0 ? '--' : `${(locateTotalTime / locateAttempts / 1000).toFixed(1)}`
     return '--'
   }
   const avgTimeDisplay = getAvgTimeDisplay()
