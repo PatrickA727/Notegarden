@@ -13,11 +13,15 @@ interface StatisticsProps {
   locateTotalTime: number
   sweepAttempts: number
   sweepCorrect: number
+  sweepRounds: number
+  sweepTotalTime: number
   collectorAttempts: number
   collectorCorrect: number
+  collectorRounds: number
+  collectorTotalTime: number
 }
 
-const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTotalTime, locateAttempts, locateCorrect, locateTotalTime, sweepAttempts, sweepCorrect, collectorAttempts, collectorCorrect }: StatisticsProps) => {
+const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTotalTime, locateAttempts, locateCorrect, locateTotalTime, sweepAttempts, sweepCorrect, sweepRounds, sweepTotalTime, collectorAttempts, collectorCorrect, collectorRounds, collectorTotalTime }: StatisticsProps) => {
   const getAccuracyDisplay = () => {
     if (activeMode === 'identify')
       return identifyAttempts === 0 ? '--' : `${Math.round((identifyCorrect / identifyAttempts) * 100)} %`
@@ -35,6 +39,10 @@ const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTot
       return identifyAttempts === 0 ? '--' : `${(identifyTotalTime / identifyAttempts / 1000).toFixed(1)}`
     if (activeMode === 'locate')
       return locateAttempts === 0 ? '--' : `${(locateTotalTime / locateAttempts / 1000).toFixed(1)}`
+    if (activeMode === 'sweep')
+      return sweepRounds === 0 ? '--' : `${(sweepTotalTime / sweepRounds / 1000).toFixed(1)}`
+    if (activeMode === 'collector')
+      return collectorRounds === 0 ? '--' : `${(collectorTotalTime / collectorRounds / 1000).toFixed(1)}`
     return '--'
   }
   const avgTimeDisplay = getAvgTimeDisplay()

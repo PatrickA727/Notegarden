@@ -7,7 +7,7 @@ import Statistics from "@/components/Statistics"
 import StringAcc from "@/components/StringAcc"
 import MainBar from "@/components/MainBar"
 import Fretboard from "@/components/Fretboard"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import StartBtn from "@/components/StartBtn"
 import useNoteRecognitionGetNote from "@/hooks/useNoteRecognitionGetNote"
 import { NOTES, NOTES_FROM_OPEN, toSharp, random } from "@/lib/utils"
@@ -67,10 +67,14 @@ const GuitarNotes = () => {
   const collectorRandomize = () => {
     setCollectorNote(random(NOTES))
     setCollectorResults(Array(6).fill(null))
+    collectorTimerStart.current = Date.now()
   }
 
   const [collectorAttempts, setCollectorAttempts] = useState(0);
   const [collectorCorrect, setCollectorCorrect] = useState(0);
+  const [collectorRounds, setCollectorRounds] = useState(0);
+  const collectorTimerStart = useRef<number | null>(null);
+  const [collectorTotalTime, setCollectorTotalTime] = useState(0);
 
   const handleCollectorFretClick = (si: number, fi: number) => {
     if (collectorResults[si] !== null) return
@@ -90,6 +94,10 @@ const GuitarNotes = () => {
     setCollectorResults(newResults)
 
     if (newResults.every(r => r !== null)) {
+      if (collectorTimerStart.current !== null) {
+        setCollectorTotalTime(prev => prev + (Date.now() - collectorTimerStart.current!))
+      }
+      setCollectorRounds(prev => prev + 1)
       setTimeout(collectorRandomize, 1200)
     }
   }
@@ -105,10 +113,15 @@ const GuitarNotes = () => {
     setSweepTargetSi(randomActiveSi(activeStrings))
     setSweepStep(0)
     setSweepResults(Array(5).fill(null))
+    sweepTimerStart.current = Date.now()
   }
 
   const [sweepAttempts, setSweepAttempts] = useState(0);
   const [sweepCorrect, setSweepCorrect] = useState(0);
+  const [sweepRounds, setSweepRounds] = useState(0);
+
+  const sweepTimerStart = useRef<number | null>(null);
+  const [sweepTotalTime, setSweepTotalTime] = useState(0);
 
   const handleSweepFretClick = (si: number, fi: number) => {
     if (si !== sweepTargetSi || sweepStep >= 5) return
@@ -129,6 +142,10 @@ const GuitarNotes = () => {
 
     if (sweepStep === 4) {
       setSweepStep(5)
+      if (sweepTimerStart.current !== null) {
+        setSweepTotalTime(prev => prev + (Date.now() - sweepTimerStart.current!))
+      }
+      setSweepRounds(prev => prev + 1)
       setTimeout(sweepRandomize, 1200)
     } else {
       setSweepStep(sweepStep + 1)
@@ -209,8 +226,12 @@ const GuitarNotes = () => {
               locateTotalTime={locateTotalTime}
               sweepAttempts={sweepAttempts}
               sweepCorrect={sweepCorrect}
+              sweepRounds={sweepRounds}
+              sweepTotalTime={sweepTotalTime}
               collectorAttempts={collectorAttempts}
               collectorCorrect={collectorCorrect}
+              collectorRounds={collectorRounds}
+              collectorTotalTime={collectorTotalTime}
               />
               <StringAcc></StringAcc>
             </div>
