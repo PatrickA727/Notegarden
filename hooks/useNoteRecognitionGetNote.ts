@@ -1,11 +1,11 @@
-import { generateNoteIndex } from "@/lib/utils";
+import { pickPosition, WeaknessMap } from "@/lib/weakness"
 import { useState } from "react"
 
-const useNoteRecognitionGetNote = (activeStrings: boolean[]) => {
-    const [{ key: position, note }, setState] = useState(generateNoteIndex(activeStrings));
+const useNoteRecognitionGetNote = (activeStrings: boolean[], weakness: WeaknessMap) => {
+    const [{ key: position, note }, setState] = useState(() => pickPosition(weakness, activeStrings));
 
     const randomize = () => {
-        setState(generateNoteIndex(activeStrings));
+        setState(pickPosition(weakness, activeStrings));
     };
 
     return { position, note, randomize };

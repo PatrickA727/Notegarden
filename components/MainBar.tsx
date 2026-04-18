@@ -3,6 +3,7 @@ import NoteRecogMain from "./NoteRecogMain"
 import LocateNoteMain from "./LocateNoteMain"
 import SweepMain from "./SweepMain"
 import CollectorMain from "./CollectorMain"
+import { WeaknessMap } from "@/lib/weakness"
 
 interface MainBarProps {
   mode: PracticeMode
@@ -13,6 +14,7 @@ interface MainBarProps {
   highlighted: Record<string, boolean>
   setHighlighted: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   activeStrings: boolean[]
+  locateWeakness: WeaknessMap
   sweepNotes: string[]
   sweepTargetSi: number
   sweepStep: number
@@ -21,11 +23,11 @@ interface MainBarProps {
   collectorResults: (boolean | null)[]
   onIdentifyAnswer: (isCorrect: boolean) => void
   onIdentifyTimerRestart: () => void
-  onLocateAnswer: (isCorrect: boolean) => void
+  onLocateAnswer: (isCorrect: boolean, key: string) => void
   onLocateTimerRestart: () => void
 }
 
-const MainBar = ({ mode, isRunning, position, note, randomize, highlighted, setHighlighted, activeStrings, sweepNotes, sweepTargetSi, sweepStep, sweepResults, collectorNote, collectorResults, onIdentifyAnswer, onIdentifyTimerRestart, onLocateAnswer, onLocateTimerRestart }: MainBarProps) => {
+const MainBar = ({ mode, isRunning, position, note, randomize, highlighted, setHighlighted, activeStrings, locateWeakness, sweepNotes, sweepTargetSi, sweepStep, sweepResults, collectorNote, collectorResults, onIdentifyAnswer, onIdentifyTimerRestart, onLocateAnswer, onLocateTimerRestart }: MainBarProps) => {
   if (!isRunning) return (
     <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-6">
       <h2 className="text-white text-2xl font-bold mb-3 px-1 tracking-wide">
@@ -38,7 +40,7 @@ const MainBar = ({ mode, isRunning, position, note, randomize, highlighted, setH
   )
 
   if (mode === "identify") return <NoteRecogMain key={position} note={note} randomize={randomize} onAnswer={onIdentifyAnswer} onTimerRestart={onIdentifyTimerRestart} />
-  if (mode === "locate") return <LocateNoteMain highlighted={highlighted} setHighlighted={setHighlighted} activeStrings={activeStrings} onAnswer={onLocateAnswer} onTimerRestart={onLocateTimerRestart} />
+  if (mode === "locate") return <LocateNoteMain highlighted={highlighted} setHighlighted={setHighlighted} activeStrings={activeStrings} weakness={locateWeakness} onAnswer={onLocateAnswer} onTimerRestart={onLocateTimerRestart} />
   if (mode === "sweep") return <SweepMain notes={sweepNotes} targetSi={sweepTargetSi} step={sweepStep} results={sweepResults} />
   if (mode === "collector") return <CollectorMain note={collectorNote} results={collectorResults} />
 }

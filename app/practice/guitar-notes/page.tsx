@@ -7,31 +7,32 @@ import Statistics from "@/components/Statistics"
 import StringAcc from "@/components/StringAcc"
 import MainBar from "@/components/MainBar"
 import Fretboard from "@/components/Fretboard"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import StartBtn from "@/components/StartBtn"
 import useNoteRecognitionGetNote from "@/hooks/useNoteRecognitionGetNote"
 import { NOTES, NOTES_FROM_OPEN, toSharp, random } from "@/lib/utils"
+import { WeaknessMap, updateWeakness, pickSweepString, pickSweepNotes, pickCollectorNote, noteToKey } from "@/lib/weakness"
 
-const randomSweepNotes = (count: number): string[] => {
-  const shuffled = [...NOTES].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, count)
-}
-
-const randomActiveSi = (activeStrings: boolean[]): number => {
-  const activeIndices = activeStrings.reduce<number[]>((acc, active, i) => {
-    if (active) acc.push(i);
-    return acc;
-  }, []);
-  return activeIndices[Math.floor(Math.random() * activeIndices.length)];
-}
 
 const GuitarNotes = () => {
   const [activeMode, setActiveMode] = useState<PracticeMode>("identify")
   const [isRunning, setIsRunning] = useState(false)
   const [highlighted, setHighlighted] = useState<Record<string, boolean>>({});
   const [activeStrings, setActiveStrings] = useState<boolean[]>(Array(6).fill(true));
-  const { position, note, randomize } = useNoteRecognitionGetNote(activeStrings);
-  
+  const [identifyWeakness, setIdentifyWeakness] = useState<WeaknessMap>({})
+  const [locateWeakness, setLocateWeakness] = useState<WeaknessMap>({})
+  const [sweepWeakness, setSweepWeakness] = useState<WeaknessMap>({})
+  const [collectorWeakness, setCollectorWeakness] = useState<WeaknessMap>({})
+
+  // Refs so that sweepRandomize/collectorRandomize always read the latest weakness
+  // even when called from a stale setTimeout closure.
+  const sweepWeaknessRef = useRef<WeaknessMap>({})
+  const collectorWeaknessRef = useRef<WeaknessMap>({})
+  useEffect(() => { sweepWeaknessRef.current = sweepWeakness }, [sweepWeakness])
+  useEffect(() => { collectorWeaknessRef.current = collectorWeakness }, [collectorWeakness])
+
+  const { position, note, randomize } = useNoteRecognitionGetNote(activeStrings, identifyWeakness);
+
   const [identifyAttempts, setIdentifyAttempts] = useState(0);
   const [identifyCorrect, setIdentifyCorrect] = useState(0);
 
@@ -44,6 +45,7 @@ const GuitarNotes = () => {
     }
     setIdentifyAttempts(prev => prev + 1);
     if (isCorrect) setIdentifyCorrect(prev => prev + 1);
+    setIdentifyWeakness(prev => updateWeakness(prev, position, isCorrect));
   }
 
   const [locateAttempts, setLocateAttempts] = useState(0);
@@ -52,12 +54,13 @@ const GuitarNotes = () => {
   const [locateTimerStart, setLocateTimerStart] = useState<number | null>(null);
   const [locateTotalTime, setLocateTotalTime] = useState(0);
 
-  const handleLocateAnswer = (isCorrect: boolean) => {
+  const handleLocateAnswer = (isCorrect: boolean, key: string) => {
     if (locateTimerStart !== null) {
       setLocateTotalTime(prev => prev + (Date.now() - locateTimerStart));
     }
     setLocateAttempts(prev => prev + 1);
     if (isCorrect) setLocateCorrect(prev => prev + 1);
+    setLocateWeakness(prev => updateWeakness(prev, key, isCorrect));
   }
 
   const [collectorNote, setCollectorNote] = useState<string>(() => random(NOTES))
@@ -65,7 +68,7 @@ const GuitarNotes = () => {
   const [collectorFlashFret, setCollectorFlashFret] = useState<{ key: string; correct: boolean } | null>(null)
 
   const collectorRandomize = () => {
-    setCollectorNote(random(NOTES))
+    setCollectorNote(pickCollectorNote(collectorWeaknessRef.current))
     setCollectorResults(Array(6).fill(null))
     collectorTimerStart.current = Date.now()
   }
@@ -88,6 +91,7 @@ const GuitarNotes = () => {
 
     if (correct) setCollectorCorrect(prev => prev + 1)
     setCollectorAttempts(prev => prev + 1)
+    setCollectorWeakness(prev => updateWeakness(prev, toSharp(collectorNote), correct))
 
     const newResults = [...collectorResults]
     newResults[si] = correct
@@ -102,15 +106,16 @@ const GuitarNotes = () => {
     }
   }
 
-  const [sweepNotes, setSweepNotes] = useState<string[]>(() => randomSweepNotes(5))
+  const [sweepNotes, setSweepNotes] = useState<string[]>(() => pickSweepNotes({}, 0, 5))
   const [sweepTargetSi, setSweepTargetSi] = useState<number>(() => Math.floor(Math.random() * 6))
   const [sweepStep, setSweepStep] = useState(0)
   const [sweepResults, setSweepResults] = useState<(boolean | null)[]>(Array(5).fill(null))
   const [flashFret, setFlashFret] = useState<{ key: string; correct: boolean } | null>(null)
 
   const sweepRandomize = () => {
-    setSweepNotes(randomSweepNotes(5))
-    setSweepTargetSi(randomActiveSi(activeStrings))
+    const newSi = pickSweepString(sweepWeaknessRef.current, activeStrings)
+    setSweepNotes(pickSweepNotes(sweepWeaknessRef.current, newSi, 5))
+    setSweepTargetSi(newSi)
     setSweepStep(0)
     setSweepResults(Array(5).fill(null))
     sweepTimerStart.current = Date.now()
@@ -139,6 +144,7 @@ const GuitarNotes = () => {
 
     if (correct) setSweepCorrect(prev => prev + 1)
     setSweepAttempts(prev => prev + 1)
+    setSweepWeakness(prev => updateWeakness(prev, noteToKey(sweepTargetSi, toSharp(sweepNotes[sweepStep])), correct))
 
     if (sweepStep === 4) {
       setSweepStep(5)
@@ -186,6 +192,7 @@ const GuitarNotes = () => {
             highlighted={highlighted}
             setHighlighted={setHighlighted}
             activeStrings={activeStrings}
+            locateWeakness={locateWeakness}
             sweepNotes={sweepNotes}
             sweepTargetSi={sweepTargetSi}
             sweepStep={sweepStep}

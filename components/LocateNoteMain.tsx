@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react"
 import useRandomNoteString from "@/hooks/useRandomNoteString"
 import { NOTES_FROM_OPEN, STRINGS, toSharp } from "@/lib/utils"
+import { WeaknessMap } from "@/lib/weakness"
 
 interface LocateNoteMainProps {
   highlighted: Record<string, boolean>
   setHighlighted: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   activeStrings: boolean[]
-  onAnswer: (isCorrect: boolean) => void
+  weakness: WeaknessMap
+  onAnswer: (isCorrect: boolean, key: string) => void
   onTimerRestart: () => void
 }
 
-const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, onAnswer, onTimerRestart }: LocateNoteMainProps) => {
-  const { note, string, randomizeNote, randomizeString } = useRandomNoteString(activeStrings);
+const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, weakness, onAnswer, onTimerRestart }: LocateNoteMainProps) => {
+  const { note, string, key: targetKey, randomize } = useRandomNoteString(activeStrings, weakness);
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
 
   useEffect(() => {
@@ -19,31 +21,26 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, onAnswer, 
   }, []);
 
   const handleEnter = () => {
-    const key = Object.keys(highlighted)[0];
-    if (!key) return;
+    const clickedKey = Object.keys(highlighted)[0];
+    if (!clickedKey) return;
 
-    const [si, fi] = key.split("-").map(Number);
+    const [si, fi] = clickedKey.split("-").map(Number);
     const selectedNote = NOTES_FROM_OPEN[si][fi + 1];
     const selectedString = STRINGS[si];
 
     const isCorrect = toSharp(selectedNote) === toSharp(note) && selectedString === string;
-    onAnswer(isCorrect);
+    onAnswer(isCorrect, targetKey);
     setResult(isCorrect ? 'correct' : 'incorrect');
 
     if (isCorrect) {
-      randomizeNote();
-      randomizeString();
+      randomize();
       setHighlighted({});
       setResult(null);
       onTimerRestart();
     } else {
-      const correctSi = STRINGS.indexOf(string);
-      const correctFretIndex = NOTES_FROM_OPEN[correctSi].findIndex((n, i) => i > 0 && n === toSharp(note));
-      const correctFi = correctFretIndex - 1;
-      setHighlighted({ [`${correctSi}-${correctFi}`]: true });
+      setHighlighted({ [targetKey]: true });
       setTimeout(() => {
-        randomizeNote();
-        randomizeString();
+        randomize();
         setHighlighted({});
         setResult(null);
         onTimerRestart();

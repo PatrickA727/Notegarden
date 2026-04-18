@@ -1,20 +1,19 @@
 import { useState } from "react"
-import { random, NOTES, STRINGS } from "@/lib/utils"
+import { STRINGS } from "@/lib/utils"
+import { pickPosition, WeaknessMap } from "@/lib/weakness"
 
-const useRandomNoteString = (activeStrings: boolean[]) => {
-  const activeStringNames = () => STRINGS.filter((_, i) => activeStrings[i]);
-  const [note, setNote] = useState(() => random(NOTES));
-  const [string, setString] = useState(() => random(activeStringNames()));
+const useRandomNoteString = (activeStrings: boolean[], weakness: WeaknessMap) => {
+  const pick = () => {
+    const { key, note } = pickPosition(weakness, activeStrings)
+    const si = parseInt(key.split("-")[0])
+    return { note, string: STRINGS[si], key }
+  }
 
-  const randomizeNote = () => {
-    setNote(random(NOTES));
-  };
+  const [state, setState] = useState(pick)
 
-  const randomizeString = () => {
-    setString(random(activeStringNames()));
-  };
+  const randomize = () => setState(pick())
 
-  return { note, string, randomizeNote, randomizeString };
+  return { note: state.note, string: state.string, key: state.key, randomize }
 }
 
 export default useRandomNoteString
