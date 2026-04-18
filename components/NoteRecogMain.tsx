@@ -35,6 +35,8 @@ const NoteRecogMain = ({ note, randomize, onAnswer, onTimerRestart }: NoteRecogP
                 <Input
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && userInput.trim() && !result) handleSubmit() }}
+                    disabled={!!result}
                     placeholder="A, C#, Bb..."
                     className="bg-transparent border-0 border-b border-zinc-600 rounded-none text-white placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:border-zinc-400 px-0 transition-colors duration-200"
                     autoFocus
