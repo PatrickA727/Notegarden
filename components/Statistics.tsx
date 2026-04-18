@@ -8,20 +8,28 @@ interface StatisticsProps {
   identifyAttempts: number
   identifyCorrect: number
   identifyTotalTime: number
+  identifyStreak: number
+  identifyBestStreak: number
   locateAttempts: number
   locateCorrect: number
   locateTotalTime: number
+  locateStreak: number
+  locateBestStreak: number
   sweepAttempts: number
   sweepCorrect: number
   sweepRounds: number
   sweepTotalTime: number
+  sweepStreak: number
+  sweepBestStreak: number
   collectorAttempts: number
   collectorCorrect: number
   collectorRounds: number
   collectorTotalTime: number
+  collectorStreak: number
+  collectorBestStreak: number
 }
 
-const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTotalTime, locateAttempts, locateCorrect, locateTotalTime, sweepAttempts, sweepCorrect, sweepRounds, sweepTotalTime, collectorAttempts, collectorCorrect, collectorRounds, collectorTotalTime }: StatisticsProps) => {
+const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTotalTime, identifyStreak, identifyBestStreak, locateAttempts, locateCorrect, locateTotalTime, locateStreak, locateBestStreak, sweepAttempts, sweepCorrect, sweepRounds, sweepTotalTime, sweepStreak, sweepBestStreak, collectorAttempts, collectorCorrect, collectorRounds, collectorTotalTime, collectorStreak, collectorBestStreak }: StatisticsProps) => {
   const getAccuracyDisplay = () => {
     if (activeMode === 'identify')
       return identifyAttempts === 0 ? '--' : `${Math.round((identifyCorrect / identifyAttempts) * 100)} %`
@@ -46,8 +54,23 @@ const Statistics = ({ activeMode, identifyAttempts, identifyCorrect, identifyTot
     return '--'
   }
   const avgTimeDisplay = getAvgTimeDisplay()
-  const streak = "5"
-  const bestStreak = "10"
+
+  const getStreakDisplay = () => {
+    if (activeMode === 'identify')  return String(identifyStreak)
+    if (activeMode === 'locate')    return String(locateStreak)
+    if (activeMode === 'sweep')     return String(sweepStreak)
+    if (activeMode === 'collector') return String(collectorStreak)
+    return '--'
+  }
+  const getBestStreakDisplay = () => {
+    if (activeMode === 'identify')  return String(identifyBestStreak)
+    if (activeMode === 'locate')    return String(locateBestStreak)
+    if (activeMode === 'sweep')     return String(sweepBestStreak)
+    if (activeMode === 'collector') return String(collectorBestStreak)
+    return '--'
+  }
+  const streak = getStreakDisplay()
+  const bestStreak = getBestStreakDisplay()
 
   return (
     <div>

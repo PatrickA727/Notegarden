@@ -17,6 +17,16 @@ import { WeaknessMap, updateWeakness, pickSweepString, pickSweepNotes, pickColle
 const GuitarNotes = () => {
   const [activeMode, setActiveMode] = useState<PracticeMode>("identify")
   const [isRunning, setIsRunning] = useState(false)
+
+  const handleToggleRunning = (running: boolean) => {
+    setIsRunning(running)
+    if (!running) {
+      setIdentifyStreak(0)
+      setLocateStreak(0)
+      setSweepStreak(0)
+      setCollectorStreak(0)
+    }
+  }
   const [highlighted, setHighlighted] = useState<Record<string, boolean>>({});
   const [activeStrings, setActiveStrings] = useState<boolean[]>(Array(6).fill(true));
   const [identifyWeakness, setIdentifyWeakness] = useState<WeaknessMap>({})
@@ -35,6 +45,19 @@ const GuitarNotes = () => {
 
   const [identifyAttempts, setIdentifyAttempts] = useState(0);
   const [identifyCorrect, setIdentifyCorrect] = useState(0);
+  const [identifyStreak, setIdentifyStreak] = useState(0);
+  const [identifyBestStreak, setIdentifyBestStreak] = useState(0);
+
+  const [locateAttempts, setLocateAttempts] = useState(0);
+  const [locateCorrect, setLocateCorrect] = useState(0);
+  const [locateStreak, setLocateStreak] = useState(0);
+  const [locateBestStreak, setLocateBestStreak] = useState(0);
+
+  const [sweepStreak, setSweepStreak] = useState(0);
+  const [sweepBestStreak, setSweepBestStreak] = useState(0);
+
+  const [collectorStreak, setCollectorStreak] = useState(0);
+  const [collectorBestStreak, setCollectorBestStreak] = useState(0);
 
   const [identifyTimerStart, setIdentifyTimerStart] = useState<number | null>(null);
   const [identifyTotalTime, setIdentifyTotalTime] = useState(0);
@@ -46,10 +69,14 @@ const GuitarNotes = () => {
     setIdentifyAttempts(prev => prev + 1);
     if (isCorrect) setIdentifyCorrect(prev => prev + 1);
     setIdentifyWeakness(prev => updateWeakness(prev, position, isCorrect));
+    if (isCorrect) {
+      const next = identifyStreak + 1
+      setIdentifyStreak(next)
+      setIdentifyBestStreak(prev => Math.max(prev, next))
+    } else {
+      setIdentifyStreak(0)
+    }
   }
-
-  const [locateAttempts, setLocateAttempts] = useState(0);
-  const [locateCorrect, setLocateCorrect] = useState(0);
 
   const [locateTimerStart, setLocateTimerStart] = useState<number | null>(null);
   const [locateTotalTime, setLocateTotalTime] = useState(0);
@@ -61,6 +88,13 @@ const GuitarNotes = () => {
     setLocateAttempts(prev => prev + 1);
     if (isCorrect) setLocateCorrect(prev => prev + 1);
     setLocateWeakness(prev => updateWeakness(prev, key, isCorrect));
+    if (isCorrect) {
+      const next = locateStreak + 1
+      setLocateStreak(next)
+      setLocateBestStreak(prev => Math.max(prev, next))
+    } else {
+      setLocateStreak(0)
+    }
   }
 
   const [collectorNote, setCollectorNote] = useState<string>(() => random(NOTES))
@@ -102,6 +136,14 @@ const GuitarNotes = () => {
         setCollectorTotalTime(prev => prev + (Date.now() - collectorTimerStart.current!))
       }
       setCollectorRounds(prev => prev + 1)
+      const roundCorrect = newResults.every(r => r === true)
+      if (roundCorrect) {
+        const next = collectorStreak + 1
+        setCollectorStreak(next)
+        setCollectorBestStreak(prev => Math.max(prev, next))
+      } else {
+        setCollectorStreak(0)
+      }
       setTimeout(collectorRandomize, 1200)
     }
   }
@@ -152,6 +194,14 @@ const GuitarNotes = () => {
         setSweepTotalTime(prev => prev + (Date.now() - sweepTimerStart.current!))
       }
       setSweepRounds(prev => prev + 1)
+      const roundCorrect = newResults.every(r => r === true)
+      if (roundCorrect) {
+        const next = sweepStreak + 1
+        setSweepStreak(next)
+        setSweepBestStreak(prev => Math.max(prev, next))
+      } else {
+        setSweepStreak(0)
+      }
       setTimeout(sweepRandomize, 1200)
     } else {
       setSweepStep(sweepStep + 1)
@@ -169,7 +219,7 @@ const GuitarNotes = () => {
                   <StartBtn
                   mode={activeMode}
                   isRunning={isRunning}
-                  onToggle={setIsRunning}
+                  onToggle={handleToggleRunning}
                   setHighlighted={setHighlighted}
                   setActiveStrings={setActiveStrings}
                   randomize={randomize}
@@ -239,6 +289,14 @@ const GuitarNotes = () => {
               collectorCorrect={collectorCorrect}
               collectorRounds={collectorRounds}
               collectorTotalTime={collectorTotalTime}
+              identifyStreak={identifyStreak}
+              identifyBestStreak={identifyBestStreak}
+              locateStreak={locateStreak}
+              locateBestStreak={locateBestStreak}
+              sweepStreak={sweepStreak}
+              sweepBestStreak={sweepBestStreak}
+              collectorStreak={collectorStreak}
+              collectorBestStreak={collectorBestStreak}
               />
               <StringAcc></StringAcc>
             </div>

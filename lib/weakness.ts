@@ -1,4 +1,4 @@
-import { NOTES_FROM_OPEN, STRINGS, toSharp } from "@/lib/utils"
+import { NOTES_FROM_OPEN, STRINGS } from "@/lib/utils"
 
 export type WeaknessBucket = { attempts: number; correct: number }
 export type WeaknessMap = Record<string, WeaknessBucket>
