@@ -74,7 +74,7 @@ export function pickSweepNotes(
 }
 
 // For collector: pick from the 12 chromatic pitch classes (enharmonics collapsed via toSharp).
-const CHROMATIC = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
+export const CHROMATIC = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 
 export function pickCollectorNote(weakness: WeaknessMap): string {
   return weightedPick(CHROMATIC, (note) => getWeight(weakness[note]))
@@ -106,4 +106,20 @@ export function noteToKey(si: number, noteSharp: string): string {
 // Derive the string index from a string name.
 export function stringNameToSi(stringName: string): number {
   return STRINGS.indexOf(stringName)
+}
+
+// Aggregate raw counts across all 12 fret positions on a string.
+// Returns null if no attempts on any position (cold start).
+export function getStringAccuracy(weakness: WeaknessMap, si: number): number | null {
+  let totalAttempts = 0
+  let totalCorrect = 0
+  for (let fi = 0; fi < 12; fi++) {
+    const bucket = weakness[`${si}-${fi}`]
+    if (bucket) {
+      totalAttempts += bucket.attempts
+      totalCorrect += bucket.correct
+    }
+  }
+  if (totalAttempts === 0) return null
+  return totalCorrect / totalAttempts
 }

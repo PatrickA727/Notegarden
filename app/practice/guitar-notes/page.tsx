@@ -298,7 +298,13 @@ const GuitarNotes = () => {
               collectorStreak={collectorStreak}
               collectorBestStreak={collectorBestStreak}
               />
-              <StringAcc></StringAcc>
+              <StringAcc
+              activeMode={activeMode}
+              identifyWeakness={identifyWeakness}
+              locateWeakness={locateWeakness}
+              sweepWeakness={sweepWeakness}
+              collectorWeakness={collectorWeakness}
+              />
             </div>
           </aside>
         </div>
