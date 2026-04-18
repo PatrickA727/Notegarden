@@ -267,6 +267,10 @@ const GuitarNotes = () => {
               sweepTargetSi={sweepTargetSi}
               onCollectorFretClick={handleCollectorFretClick}
               collectorFlashFret={collectorFlashFret}
+              identifyWeakness={identifyWeakness}
+              locateWeakness={locateWeakness}
+              sweepWeakness={sweepWeakness}
+              collectorWeakness={collectorWeakness}
               />
             </div>
           </main>

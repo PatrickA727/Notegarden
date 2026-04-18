@@ -1,6 +1,8 @@
+import { useState } from "react"
 import { Minus, X } from "lucide-react"
 import { PracticeMode } from "@/types";
-import { NOTES_FROM_OPEN } from "@/lib/utils";
+import { NOTES_FROM_OPEN, toSharp } from "@/lib/utils";
+import { WeaknessMap } from "@/lib/weakness";
 
 const STRING_NAMES = ["E", "B", "G", "D", "A", "E"];
 const THICKNESSES = [1, 1.2, 1.6, 2, 2.4, 2.8];
@@ -21,9 +23,27 @@ interface FretboardProps {
   sweepTargetSi?: number
   onCollectorFretClick?: (si: number, fi: number) => void
   collectorFlashFret?: { key: string; correct: boolean } | null
+  identifyWeakness: WeaknessMap
+  locateWeakness: WeaknessMap
+  sweepWeakness: WeaknessMap
+  collectorWeakness: WeaknessMap
 }
 
-const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings, setActiveStrings, onSweepFretClick, flashFret, sweepTargetSi, onCollectorFretClick, collectorFlashFret }: FretboardProps) => {
+const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings, setActiveStrings, onSweepFretClick, flashFret, sweepTargetSi, onCollectorFretClick, collectorFlashFret, identifyWeakness, locateWeakness, sweepWeakness, collectorWeakness }: FretboardProps) => {
+  const [showHeatmap, setShowHeatmap] = useState(false)
+
+  const getHeatmapColor = (pct: number): string => {
+    if (pct <= 50) return '#ef4444'
+    if (pct <= 65) return '#f97316'
+    if (pct <= 85) return '#eab308'
+    return '#22c55e'
+  }
+
+  const activeWeakness =
+    mode === 'identify' ? identifyWeakness :
+    mode === 'locate'   ? locateWeakness   :
+    mode === 'sweep'    ? sweepWeakness    :
+                          collectorWeakness
   const toggleString = (si: number) => {
     if (isRunning && mode === "collector") {
       setActiveStrings(Array(6).fill(true));
@@ -63,6 +83,20 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
 
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 font-mono select-none">
+      {!isRunning && (
+        <div className="flex justify-start mb-2">
+          <button
+            onClick={() => setShowHeatmap(h => !h)}
+            className={`text-xs px-3 py-1 rounded-md border transition-all duration-200 ${
+              showHeatmap
+                ? 'bg-zinc-700 border-zinc-500 text-zinc-200'
+                : 'bg-transparent border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-500'
+            }`}
+          >
+            Heatmap
+          </button>
+        </div>
+      )}
       <div className="flex items-stretch gap-2.5">
 
         {/* String Toggles */}
@@ -134,7 +168,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                           isClickable ? "cursor-pointer hover:bg-white/[0.05]" : "cursor-default"
                         }`}
                         onClick={() => {
-                          if (activeStrings[si] && !isRunning) {
+                          if (activeStrings[si] && !isRunning && !showHeatmap) {
                             toggleFret(si, fi)
                           } else if (activeStrings[si] && isRunning && mode === "locate") {
                             toggleLocateNoteFret(si, fi)
@@ -204,6 +238,27 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                             style={{ animation: "fbpop .14s ease" }}
                           />
                         )}
+
+                        {/* Heatmap dot */}
+                        {!isRunning && showHeatmap && (() => {
+                          const note = NOTES_FROM_OPEN[si][fi + 1]
+                          const noteKey = mode === 'collector' ? toSharp(note) : key
+                          const bucket = activeWeakness[noteKey]
+                          const pct = bucket && bucket.attempts > 0
+                            ? Math.round(bucket.correct / bucket.attempts * 100)
+                            : null
+                          return (
+                            <div
+                              className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[9px] font-bold relative z-20"
+                              style={{
+                                backgroundColor: pct !== null ? getHeatmapColor(pct) : '#52525b',
+                                opacity: pct !== null ? 0.85 : 0.4,
+                              }}
+                            >
+                              {pct !== null ? `${pct}%` : ''}
+                            </div>
+                          )
+                        })()}
 
                       </div>
                     );
