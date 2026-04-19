@@ -52,10 +52,10 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
       return;
     }
 
-    const next = [...activeStrings];       // Create shallow copy of activeStrings
+    const next = [...activeStrings];
     next[si] = !next[si];
-    setActiveStrings(next);                // Update the real activeStrings state
-    if (activeStrings[si]) {               // Still uses old activeStrings value/state. This statement clears active frets when user deactivates a string
+    setActiveStrings(next);
+    if (activeStrings[si]) {
       setHighlighted((prev) => {
         const n = { ...prev };
         Object.keys(n).forEach((k) => {
