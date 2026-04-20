@@ -125,7 +125,7 @@ const GuitarNotes = () => {
 
     if (correct) setCollectorCorrect(prev => prev + 1)
     setCollectorAttempts(prev => prev + 1)
-    setCollectorWeakness(prev => updateWeakness(prev, toSharp(collectorNote), correct))
+    setCollectorWeakness(prev => updateWeakness(prev, noteToKey(si, expected), correct))
 
     const newResults = [...collectorResults]
     newResults[si] = correct

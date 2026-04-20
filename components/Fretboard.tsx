@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Minus, X } from "lucide-react"
 import { PracticeMode } from "@/types";
-import { NOTES_FROM_OPEN, toSharp } from "@/lib/utils";
+import { NOTES_FROM_OPEN } from "@/lib/utils";
 import { WeaknessMap } from "@/lib/weakness";
 
 const STRING_NAMES = ["E", "B", "G", "D", "A", "E"];
@@ -241,9 +241,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
 
                         {/* Heatmap dot */}
                         {!isRunning && showHeatmap && (() => {
-                          const note = NOTES_FROM_OPEN[si][fi + 1]
-                          const noteKey = mode === 'collector' ? toSharp(note) : key
-                          const bucket = activeWeakness[noteKey]
+                          const bucket = activeWeakness[key]
                           const pct = bucket && bucket.attempts > 0
                             ? Math.round(bucket.correct / bucket.attempts * 100)
                             : null

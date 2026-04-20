@@ -1,6 +1,6 @@
 import { type PracticeMode } from "@/types"
 import { STRINGS } from "@/lib/utils"
-import { WeaknessMap, getStringAccuracy, CHROMATIC } from "@/lib/weakness"
+import { WeaknessMap, getStringAccuracy, aggregateNoteBucket, CHROMATIC } from "@/lib/weakness"
 
 interface StringAccProps {
   activeMode: PracticeMode
@@ -23,8 +23,8 @@ const StringAcc = ({ activeMode, identifyWeakness, locateWeakness, sweepWeakness
   const items = isCollector
     ? [...CHROMATIC]
         .map(note => {
-          const bucket = collectorWeakness[note]
-          const accuracy = bucket && bucket.attempts > 0
+          const bucket = aggregateNoteBucket(collectorWeakness, note)
+          const accuracy = bucket.attempts > 0
             ? bucket.correct / bucket.attempts
             : null
           return { label: note, accuracy }

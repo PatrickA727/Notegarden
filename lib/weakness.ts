@@ -1,4 +1,4 @@
-import { NOTES_FROM_OPEN, STRINGS } from "@/lib/utils"
+import { NOTES_FROM_OPEN, STRINGS, toSharp } from "@/lib/utils"
 
 export type WeaknessBucket = { attempts: number; correct: number }
 export type WeaknessMap = Record<string, WeaknessBucket>
@@ -76,8 +76,27 @@ export function pickSweepNotes(
 // For collector: pick from the 12 chromatic pitch classes (enharmonics collapsed via toSharp).
 export const CHROMATIC = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 
+// Collector weakness is keyed by "si-fi" like identify/locate/sweep. This sums the
+// 6 position buckets whose note matches `pitchClass` so we can show a per-note view.
+export function aggregateNoteBucket(weakness: WeaknessMap, pitchClass: string): WeaknessBucket {
+  let attempts = 0
+  let correct = 0
+  for (let si = 0; si < 6; si++) {
+    for (let fi = 0; fi < 12; fi++) {
+      if (toSharp(NOTES_FROM_OPEN[si][fi + 1]) === pitchClass) {
+        const b = weakness[`${si}-${fi}`]
+        if (b) {
+          attempts += b.attempts
+          correct += b.correct
+        }
+      }
+    }
+  }
+  return { attempts, correct }
+}
+
 export function pickCollectorNote(weakness: WeaknessMap): string {
-  return weightedPick(CHROMATIC, (note) => getWeight(weakness[note]))
+  return weightedPick(CHROMATIC, (note) => getWeight(aggregateNoteBucket(weakness, note)))
 }
 
 // Immutable bucket update — returns a new WeaknessMap with the key's bucket updated.
