@@ -12,7 +12,7 @@ export const modeStats = pgTable('mode_stats', {
   rounds:      integer('rounds').notNull().default(0),                                          // always 0 for identify/locate
   bestStreak:  integer('best_streak').notNull().default(0),
   updatedAt:   timestamp('updated_at').notNull().defaultNow(),
-}, (t) => ({ pk: primaryKey({ columns: [t.userId, t.mode] }) }));
+}, (t) => ({ pk: primaryKey({ columns: [t.userId, t.mode] }) }));                               // Composite keys
 
 export const weaknessBucket = pgTable('weakness_bucket', {
   userId:    text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
@@ -42,9 +42,7 @@ export const user = pgTable("user", {
     .notNull(),
 });
 
-export const session = pgTable(
-  "session",
-  {
+export const session = pgTable("session", {
     id: text("id").primaryKey(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
@@ -61,9 +59,7 @@ export const session = pgTable(
   (table) => [index("session_userId_idx").on(table.userId)],
 );
 
-export const account = pgTable(
-  "account",
-  {
+export const account = pgTable("account", {
     id: text("id").primaryKey(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
@@ -101,7 +97,7 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many }) => ({                   // Relations are mainly for simpler and safer joins
   sessions: many(session),
   accounts: many(account),
 }));
