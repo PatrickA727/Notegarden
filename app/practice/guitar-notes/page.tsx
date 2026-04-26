@@ -1,6 +1,7 @@
 "use client"
 
 import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 import Modes from "@/components/Modes"
 import { type PracticeMode } from "@/types"
 import Statistics from "@/components/Statistics"
@@ -211,7 +212,7 @@ const GuitarNotes = () => {
   return (
     <div>
         <Navbar></Navbar>
-        <div className="flex h-screen">
+        <div className="flex h-screen pt-5">
           <aside className="w-80 bg-zinc-950 text-white flex items-start justify-center pt-20">
             <div className="w-77">
               <Modes onModeChange={setActiveMode} isRunning={isRunning} />
@@ -312,6 +313,7 @@ const GuitarNotes = () => {
             </div>
           </aside>
         </div>
+      <Footer />
     </div>
   )
 }

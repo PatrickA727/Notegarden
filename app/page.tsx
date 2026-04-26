@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar"
-import Image from "next/image"
+import Footer from "@/components/Footer"
 import Link from "next/link"
-import { Target, Eye, Zap, Music, BarChart3, Crosshair, Repeat } from "lucide-react"
+import { Target, Eye, Zap, Music, BarChart3, Crosshair, Repeat, BarChart2, Clock, Flame, Map } from "lucide-react"
 
 const modes = [
   {
@@ -59,15 +59,33 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative flex flex-1 flex-col items-center justify-center text-center px-6 py-28 min-h-[calc(100vh-65px)] overflow-hidden">
-        {/* Dot grid texture */}
+        {/* Layer 1: Dot grid — reduced opacity to blend with new layers */}
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle, rgba(82,82,91,0.4) 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(circle, rgba(82,82,91,0.25) 1px, transparent 1px)`,
             backgroundSize: `28px 28px`,
           }}
         />
-        {/* Radial vignette — fades dots toward edges, focuses center */}
+        {/* Layer 2: SVG grain — ultra-subtle organic texture */}
+        <svg
+          className="absolute inset-0 w-full h-full opacity-[0.04]"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <filter id="hero-noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#hero-noise)" />
+        </svg>
+        {/* Layer 3: Center zinc glow — soft bloom behind the headline */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(ellipse 60% 50% at 50% 50%, rgba(113,113,122,0.15) 0%, transparent 70%)`,
+          }}
+        />
+        {/* Layer 4: Edge vignette — fades everything toward the edges */}
         <div
           className="absolute inset-0"
           style={{
@@ -169,6 +187,59 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Stats / Progress Tracking */}
+      <section className="px-6 py-20 border-y border-zinc-800 bg-zinc-900/40">
+        <div className="max-w-4xl mx-auto text-center">
+          <span className="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-4 block">
+            Progress Tracking
+          </span>
+          <h2 className="text-white text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+            Every rep, measured.
+          </h2>
+          <p className="text-zinc-400 text-base max-w-lg mx-auto mb-14 leading-relaxed">
+            Notegarden records the numbers that actually tell you how you&apos;re improving — not just whether you got it right.
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              {
+                icon: BarChart2,
+                title: "Accuracy per mode",
+                body: "Live correct-answer percentage across all four practice modes.",
+              },
+              {
+                icon: Clock,
+                title: "Response time",
+                body: "Average seconds per question or round, tracked as you drill.",
+              },
+              {
+                icon: Flame,
+                title: "Streaks & bests",
+                body: "Current hot streak and all-time personal record, per mode.",
+              },
+              {
+                icon: Map,
+                title: "72-position heatmap",
+                body: "Per-fret accuracy overlaid on the fretboard so you see gaps at a glance.",
+              },
+            ].map(({ icon: Icon, title, body }) => (
+              <div
+                key={title}
+                className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 text-left flex flex-col gap-3"
+              >
+                <div className="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center">
+                  <Icon className="w-4 h-4 text-zinc-300" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold text-sm mb-1.5">{title}</h3>
+                  <p className="text-zinc-500 text-xs leading-relaxed">{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Second CTA */}
       <section className="relative px-6 py-28 text-center overflow-hidden border-t border-zinc-800">
         {/* Dot grid mirrored from hero */}
@@ -204,39 +275,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-zinc-900 border-t border-zinc-800 px-6 py-8">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <Image
-              src="/nobg_note.png"
-              alt="Notegarden logo"
-              width={16}
-              height={16}
-              className="object-contain"
-            />
-            <span className="text-white font-semibold text-sm">Notegarden</span>
-          </div>
-
-          <div className="flex items-center gap-5 text-zinc-500 text-xs">
-            <a
-              href="https://github.com/PatrickA727"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-zinc-300 transition-colors"
-            >
-              GitHub
-            </a>
-            <a
-              href="mailto:patrick.a7787@gmail.com"
-              className="hover:text-zinc-300 transition-colors"
-            >
-              Contact
-            </a>
-            <span>© {new Date().getFullYear()} Notegarden</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
