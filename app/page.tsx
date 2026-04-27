@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
+import SignInButton from "@/components/SignInButton"
 import Link from "next/link"
 import { Target, Eye, Zap, Music, BarChart3, Crosshair, Repeat, BarChart2, Clock, Flame, Map } from "lucide-react"
 
@@ -96,7 +97,7 @@ export default function Home() {
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center">
           <span className="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-6">
-            Guitar Theory Practice
+            Guitar Fretboard Practice
           </span>
           <h1 className="text-white text-5xl sm:text-6xl font-bold tracking-tight max-w-2xl leading-[1.1] mb-5">
             Ready to master your fretboard?
@@ -112,9 +113,7 @@ export default function Home() {
             >
               Start Practicing
             </Link>
-            <button className="border border-zinc-700 text-zinc-200 text-sm font-semibold px-7 py-3 rounded-lg hover:bg-zinc-800 hover:border-zinc-600 active:scale-[0.98] transition-all duration-150 cursor-pointer">
-              Sign in with Google
-            </button>
+            <SignInButton className="border border-zinc-700 text-zinc-200 text-sm font-semibold px-7 py-3 rounded-lg hover:bg-zinc-800 hover:border-zinc-600 active:scale-[0.98] transition-all duration-150 cursor-pointer" />
           </div>
         </div>
       </section>
@@ -237,6 +236,10 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          <p className="mt-10 text-zinc-600 text-xs">
+            Sign in to save your stats and pick up where you left off.
+          </p>
         </div>
       </section>
 
@@ -268,9 +271,7 @@ export default function Home() {
             >
               Start Practicing
             </Link>
-            <button className="border border-zinc-700 text-zinc-200 text-sm font-semibold px-7 py-3 rounded-lg hover:bg-zinc-800 hover:border-zinc-600 active:scale-[0.98] transition-all duration-150 cursor-pointer">
-              Sign in with Google
-            </button>
+            <SignInButton className="border border-zinc-700 text-zinc-200 text-sm font-semibold px-7 py-3 rounded-lg hover:bg-zinc-800 hover:border-zinc-600 active:scale-[0.98] transition-all duration-150 cursor-pointer" />
           </div>
         </div>
       </section>

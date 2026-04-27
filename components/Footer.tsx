@@ -2,8 +2,8 @@ import Image from "next/image"
 
 export default function Footer() {
   return (
-    <footer className="bg-zinc-900 border-t border-zinc-800 px-6 py-8">
-      <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <footer className="bg-zinc-900 border-t border-zinc-800 px-7 py-8">
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <Image
             src="/nobg_note.png"
@@ -12,7 +12,7 @@ export default function Footer() {
             height={16}
             className="object-contain"
           />
-          <span className="text-white font-semibold text-sm">Notegarden</span>
+          <span className="text-white font-semibold text-md">Notegarden</span>
         </div>
 
         <div className="flex items-center gap-5 text-zinc-500 text-xs">
