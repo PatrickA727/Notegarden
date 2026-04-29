@@ -16,6 +16,8 @@ import { WeaknessMap, updateWeakness, pickSweepString, pickSweepNotes, pickColle
 
 
 const GuitarNotes = () => {
+  useEffect(() => { sessionStorage.removeItem('oauth_pending') }, [])
+
   const [activeMode, setActiveMode] = useState<PracticeMode>("identify")
   const [isRunning, setIsRunning] = useState(false)
 

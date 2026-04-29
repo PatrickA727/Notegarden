@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from "next/link"
-import SignInButton from "@/components/SignInButton"
+import NavbarAuth from "@/components/NavbarAuth"
 
 export default function Navbar() {
   return (
@@ -17,10 +17,7 @@ export default function Navbar() {
           <span className="text-white font-semibold text-lg tracking-tight">Notegarden</span>
         </Link>
 
-        <SignInButton
-          label="Sign In"
-          className="border border-zinc-700 text-zinc-300 text-sm font-medium px-5 py-2 rounded-full hover:border-zinc-500 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer"
-        />
+        <NavbarAuth />
       </div>
     </nav>
   )

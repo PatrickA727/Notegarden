@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
-import SignInButton from "@/components/SignInButton"
+import HeroButtons from "@/components/HeroButtons"
 import Link from "next/link"
 import { Target, Eye, Zap, Music, BarChart3, Crosshair, Repeat, BarChart2, Clock, Flame, Map } from "lucide-react"
 
@@ -106,15 +106,7 @@ export default function Home() {
             Most guitarists plateau because they&apos;re guessing. Notegarden drills you until every
             note on the neck becomes second nature.
           </p>
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <Link
-              href="/practice/guitar-notes"
-              className="bg-zinc-50 text-zinc-900 text-sm font-semibold px-7 py-3 rounded-lg hover:bg-zinc-200 active:scale-[0.98] transition-all duration-150"
-            >
-              Start Practicing
-            </Link>
-            <SignInButton className="border border-zinc-700 text-zinc-200 text-sm font-semibold px-7 py-3 rounded-lg hover:bg-zinc-800 hover:border-zinc-600 active:scale-[0.98] transition-all duration-150 cursor-pointer" />
-          </div>
+          <HeroButtons />
         </div>
       </section>
 
@@ -265,13 +257,7 @@ export default function Home() {
           </h2>
           <p className="text-zinc-400 text-base mb-8">Start drilling now — no account needed.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              href="/practice/guitar-notes"
-              className="bg-zinc-50 text-zinc-900 text-sm font-semibold px-7 py-3 rounded-lg hover:bg-zinc-200 active:scale-[0.98] transition-all duration-150"
-            >
-              Start Practicing
-            </Link>
-            <SignInButton className="border border-zinc-700 text-zinc-200 text-sm font-semibold px-7 py-3 rounded-lg hover:bg-zinc-800 hover:border-zinc-600 active:scale-[0.98] transition-all duration-150 cursor-pointer" />
+            <HeroButtons />
           </div>
         </div>
       </section>
