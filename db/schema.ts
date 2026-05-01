@@ -17,17 +17,17 @@ export const modeStats = pgTable('mode_stats', {
 export const weaknessBucket = pgTable('weakness_bucket', {
   userId:    text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   mode:      mode('mode').notNull(),
-  key:       text('key').notNull(),                                                             // "si-fi" for identify/locate/sweep; pitch class for collector
+  key:       text('key').notNull(),                                                             // "si-fi" for all modes; collector aggregates by pitch class on read
   attempts:  integer('attempts').notNull().default(0),
   correct:   integer('correct').notNull().default(0),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 }, (t) => ({ pk: primaryKey({ columns: [t.userId, t.mode, t.key] }) }));
 
 export const syncRequest = pgTable('sync_request', {
-  requestId:   text('request_id').primaryKey(),
+  requestId:   text('request_id').notNull(),
   userId:      text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
   processedAt: timestamp('processed_at').notNull().defaultNow(),
-});
+}, (t) => ({ pk: primaryKey({ columns: [t.userId, t.requestId] }) }));
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),

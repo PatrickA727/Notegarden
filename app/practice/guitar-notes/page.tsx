@@ -13,10 +13,15 @@ import StartBtn from "@/components/StartBtn"
 import useNoteRecognitionGetNote from "@/hooks/useNoteRecognitionGetNote"
 import { NOTES, NOTES_FROM_OPEN, toSharp, random } from "@/lib/utils"
 import { WeaknessMap, updateWeakness, pickSweepString, pickSweepNotes, pickCollectorNote, noteToKey } from "@/lib/weakness"
+import { authClient } from "@/lib/auth-client"
+import { recordModeDelta, recordWeaknessDelta, flush, flushOnUnload, setSyncEnabled } from "@/lib/sync/client"
 
 
 const GuitarNotes = () => {
   useEffect(() => { sessionStorage.removeItem('oauth_pending') }, [])
+
+  const { data: session } = authClient.useSession()
+  const userId = session?.user?.id ?? null
 
   const [activeMode, setActiveMode] = useState<PracticeMode>("identify")
   const [isRunning, setIsRunning] = useState(false)
@@ -28,6 +33,7 @@ const GuitarNotes = () => {
       setLocateStreak(0)
       setSweepStreak(0)
       setCollectorStreak(0)
+      flush()
     }
   }
   const [highlighted, setHighlighted] = useState<Record<string, boolean>>({});
@@ -66,38 +72,46 @@ const GuitarNotes = () => {
   const [identifyTotalTime, setIdentifyTotalTime] = useState(0);
 
   const handleIdentifyAnswer = (isCorrect: boolean) => {
+    const elapsed = identifyTimerStart !== null ? Date.now() - identifyTimerStart : 0
     if (identifyTimerStart !== null) {
-      setIdentifyTotalTime(prev => prev + (Date.now() - identifyTimerStart));
+      setIdentifyTotalTime(prev => prev + elapsed);
     }
     setIdentifyAttempts(prev => prev + 1);
     if (isCorrect) setIdentifyCorrect(prev => prev + 1);
     setIdentifyWeakness(prev => updateWeakness(prev, position, isCorrect));
+    const nextStreak = isCorrect ? identifyStreak + 1 : 0
+    const nextBest = Math.max(identifyBestStreak, nextStreak)
     if (isCorrect) {
-      const next = identifyStreak + 1
-      setIdentifyStreak(next)
-      setIdentifyBestStreak(prev => Math.max(prev, next))
+      setIdentifyStreak(nextStreak)
+      setIdentifyBestStreak(nextBest)
     } else {
       setIdentifyStreak(0)
     }
+    recordModeDelta({ mode: 'identify', attempts: 1, correct: isCorrect ? 1 : 0, totalTimeMs: elapsed, rounds: 0, bestStreak: nextBest })
+    recordWeaknessDelta({ mode: 'identify', key: position, attempts: 1, correct: isCorrect ? 1 : 0 })
   }
 
   const [locateTimerStart, setLocateTimerStart] = useState<number | null>(null);
   const [locateTotalTime, setLocateTotalTime] = useState(0);
 
   const handleLocateAnswer = (isCorrect: boolean, key: string) => {
+    const elapsed = locateTimerStart !== null ? Date.now() - locateTimerStart : 0
     if (locateTimerStart !== null) {
-      setLocateTotalTime(prev => prev + (Date.now() - locateTimerStart));
+      setLocateTotalTime(prev => prev + elapsed);
     }
     setLocateAttempts(prev => prev + 1);
     if (isCorrect) setLocateCorrect(prev => prev + 1);
     setLocateWeakness(prev => updateWeakness(prev, key, isCorrect));
+    const nextStreak = isCorrect ? locateStreak + 1 : 0
+    const nextBest = Math.max(locateBestStreak, nextStreak)
     if (isCorrect) {
-      const next = locateStreak + 1
-      setLocateStreak(next)
-      setLocateBestStreak(prev => Math.max(prev, next))
+      setLocateStreak(nextStreak)
+      setLocateBestStreak(nextBest)
     } else {
       setLocateStreak(0)
     }
+    recordModeDelta({ mode: 'locate', attempts: 1, correct: isCorrect ? 1 : 0, totalTimeMs: elapsed, rounds: 0, bestStreak: nextBest })
+    recordWeaknessDelta({ mode: 'locate', key, attempts: 1, correct: isCorrect ? 1 : 0 })
   }
 
   const [collectorNote, setCollectorNote] = useState<string>(() => random(NOTES))
@@ -128,25 +142,31 @@ const GuitarNotes = () => {
 
     if (correct) setCollectorCorrect(prev => prev + 1)
     setCollectorAttempts(prev => prev + 1)
-    setCollectorWeakness(prev => updateWeakness(prev, noteToKey(si, expected), correct))
+    const weaknessKey = noteToKey(si, expected)
+    setCollectorWeakness(prev => updateWeakness(prev, weaknessKey, correct))
+    recordModeDelta({ mode: 'collector', attempts: 1, correct: correct ? 1 : 0, totalTimeMs: 0, rounds: 0, bestStreak: 0 })
+    recordWeaknessDelta({ mode: 'collector', key: weaknessKey, attempts: 1, correct: correct ? 1 : 0 })
 
     const newResults = [...collectorResults]
     newResults[si] = correct
     setCollectorResults(newResults)
 
     if (newResults.every(r => r !== null)) {
+      const elapsed = collectorTimerStart.current !== null ? Date.now() - collectorTimerStart.current : 0
       if (collectorTimerStart.current !== null) {
-        setCollectorTotalTime(prev => prev + (Date.now() - collectorTimerStart.current!))
+        setCollectorTotalTime(prev => prev + elapsed)
       }
       setCollectorRounds(prev => prev + 1)
       const roundCorrect = newResults.every(r => r === true)
+      const nextStreak = roundCorrect ? collectorStreak + 1 : 0
+      const nextBest = Math.max(collectorBestStreak, nextStreak)
       if (roundCorrect) {
-        const next = collectorStreak + 1
-        setCollectorStreak(next)
-        setCollectorBestStreak(prev => Math.max(prev, next))
+        setCollectorStreak(nextStreak)
+        setCollectorBestStreak(nextBest)
       } else {
         setCollectorStreak(0)
       }
+      recordModeDelta({ mode: 'collector', attempts: 0, correct: 0, totalTimeMs: elapsed, rounds: 1, bestStreak: nextBest })
       setTimeout(collectorRandomize, 1200)
     }
   }
@@ -189,27 +209,130 @@ const GuitarNotes = () => {
 
     if (correct) setSweepCorrect(prev => prev + 1)
     setSweepAttempts(prev => prev + 1)
-    setSweepWeakness(prev => updateWeakness(prev, noteToKey(sweepTargetSi, toSharp(sweepNotes[sweepStep])), correct))
+    const weaknessKey = noteToKey(sweepTargetSi, toSharp(sweepNotes[sweepStep]))
+    setSweepWeakness(prev => updateWeakness(prev, weaknessKey, correct))
+    recordModeDelta({ mode: 'sweep', attempts: 1, correct: correct ? 1 : 0, totalTimeMs: 0, rounds: 0, bestStreak: 0 })
+    recordWeaknessDelta({ mode: 'sweep', key: weaknessKey, attempts: 1, correct: correct ? 1 : 0 })
 
     if (sweepStep === 4) {
       setSweepStep(5)
+      const elapsed = sweepTimerStart.current !== null ? Date.now() - sweepTimerStart.current : 0
       if (sweepTimerStart.current !== null) {
-        setSweepTotalTime(prev => prev + (Date.now() - sweepTimerStart.current!))
+        setSweepTotalTime(prev => prev + elapsed)
       }
       setSweepRounds(prev => prev + 1)
       const roundCorrect = newResults.every(r => r === true)
+      const nextStreak = roundCorrect ? sweepStreak + 1 : 0
+      const nextBest = Math.max(sweepBestStreak, nextStreak)
       if (roundCorrect) {
-        const next = sweepStreak + 1
-        setSweepStreak(next)
-        setSweepBestStreak(prev => Math.max(prev, next))
+        setSweepStreak(nextStreak)
+        setSweepBestStreak(nextBest)
       } else {
         setSweepStreak(0)
       }
+      recordModeDelta({ mode: 'sweep', attempts: 0, correct: 0, totalTimeMs: elapsed, rounds: 1, bestStreak: nextBest })
       setTimeout(sweepRandomize, 1200)
     } else {
       setSweepStep(sweepStep + 1)
     }
   }
+
+  // Hydrate from server on sign-in. Sync stays disabled until hydration completes
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      // Wipe progress on every userId transition
+      setIdentifyAttempts(0)
+      setIdentifyCorrect(0)
+      setIdentifyTotalTime(0)
+      setIdentifyStreak(0)
+      setIdentifyBestStreak(0)
+      setLocateAttempts(0)
+      setLocateCorrect(0)
+      setLocateTotalTime(0)
+      setLocateStreak(0)
+      setLocateBestStreak(0)
+      setSweepAttempts(0)
+      setSweepCorrect(0)
+      setSweepTotalTime(0)
+      setSweepRounds(0)
+      setSweepStreak(0)
+      setSweepBestStreak(0)
+      setCollectorAttempts(0)
+      setCollectorCorrect(0)
+      setCollectorTotalTime(0)
+      setCollectorRounds(0)
+      setCollectorStreak(0)
+      setCollectorBestStreak(0)
+      setIdentifyWeakness({})
+      setLocateWeakness({})
+      setSweepWeakness({})
+      setCollectorWeakness({})
+
+      if (!userId) {
+        setSyncEnabled(false)
+        return
+      }
+
+      try {
+        const res = await fetch('/api/me/state', { cache: 'no-store' })
+        if (!res.ok || cancelled) return
+        const data = await res.json() as {
+          modeStats: Array<{ mode: PracticeMode; attempts: number; correct: number; totalTimeMs: number; rounds: number; bestStreak: number }>
+          weaknessBuckets: Array<{ mode: PracticeMode; key: string; attempts: number; correct: number }>
+        }
+        if (cancelled) return
+        for (const s of data.modeStats) {
+          if (s.mode === 'identify') {
+            setIdentifyAttempts(s.attempts)
+            setIdentifyCorrect(s.correct)
+            setIdentifyTotalTime(s.totalTimeMs)
+            setIdentifyBestStreak(s.bestStreak)
+          } else if (s.mode === 'locate') {
+            setLocateAttempts(s.attempts)
+            setLocateCorrect(s.correct)
+            setLocateTotalTime(s.totalTimeMs)
+            setLocateBestStreak(s.bestStreak)
+          } else if (s.mode === 'sweep') {
+            setSweepAttempts(s.attempts)
+            setSweepCorrect(s.correct)
+            setSweepTotalTime(s.totalTimeMs)
+            setSweepRounds(s.rounds)
+            setSweepBestStreak(s.bestStreak)
+          } else if (s.mode === 'collector') {
+            setCollectorAttempts(s.attempts)
+            setCollectorCorrect(s.correct)
+            setCollectorTotalTime(s.totalTimeMs)
+            setCollectorRounds(s.rounds)
+            setCollectorBestStreak(s.bestStreak)
+          }
+        }
+        const id: WeaknessMap = {}, lo: WeaknessMap = {}, sw: WeaknessMap = {}, co: WeaknessMap = {}
+        for (const b of data.weaknessBuckets) {
+          const target = b.mode === 'identify' ? id : b.mode === 'locate' ? lo : b.mode === 'sweep' ? sw : co
+          target[b.key] = { attempts: b.attempts, correct: b.correct }
+        }
+        setIdentifyWeakness(id)
+        setLocateWeakness(lo)
+        setSweepWeakness(sw)
+        setCollectorWeakness(co)
+        setSyncEnabled(true)
+      } catch {}
+    })()
+    return () => { cancelled = true }
+  }, [userId])
+
+  // Periodic flush + flush on tab close. Only active when signed in.
+  useEffect(() => {
+    if (!userId) return
+    const id = setInterval(() => { flush() }, 5000)
+    const onBeforeUnload = () => { flushOnUnload() }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => {
+      clearInterval(id)
+      window.removeEventListener('beforeunload', onBeforeUnload)
+    }
+  }, [userId])
 
   return (
     <div>
