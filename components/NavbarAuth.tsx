@@ -32,7 +32,10 @@ export default function NavbarAuth() {
         {open && (
           <div className="absolute right-0 top-9 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl py-1 min-w-[120px] z-50">
             <button
-              onClick={() => authClient.signOut()}
+              onClick={async () => {
+                await authClient.signOut()
+                window.location.href = '/'
+              }}
               className="w-full text-left px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors cursor-pointer"
               type="button"
             >
