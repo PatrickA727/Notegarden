@@ -27,9 +27,10 @@ interface FretboardProps {
   locateWeakness: WeaknessMap
   sweepWeakness: WeaknessMap
   collectorWeakness: WeaknessMap
+  locateFeedback: boolean
 }
 
-const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings, setActiveStrings, onSweepFretClick, flashFret, sweepTargetSi, onCollectorFretClick, collectorFlashFret, identifyWeakness, locateWeakness, sweepWeakness, collectorWeakness }: FretboardProps) => {
+const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings, setActiveStrings, onSweepFretClick, flashFret, sweepTargetSi, onCollectorFretClick, collectorFlashFret, identifyWeakness, locateWeakness, sweepWeakness, collectorWeakness, locateFeedback }: FretboardProps) => {
   const [showHeatmap, setShowHeatmap] = useState(false)
 
   const getHeatmapColor = (pct: number): string => {
@@ -154,10 +155,10 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                   {Array.from({ length: FRET_COUNT }, (_, i) => {     // Create new array. Make 12 elements. And map over it.
                     const fi = i;
                     const key = `${si}-${fi}`;
-                    const isLit = !!highlighted[key] && isActive && !isRunning;     // Check if current fret is highlighted and string is active
+                    const isLit = !!highlighted[key] && isActive && !isRunning && !showHeatmap;     // Check if current fret is highlighted and string is active
                     const isClickable = isActive && (
                       !isRunning ||
-                      (isRunning && mode === "locate") ||
+                      (isRunning && mode === "locate" && !locateFeedback) ||
                       (isRunning && mode === "sweep" && !isSweepInactive) ||
                       (isRunning && mode === "collector")
                     );
@@ -170,7 +171,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                         onClick={() => {
                           if (activeStrings[si] && !isRunning && !showHeatmap) {
                             toggleFret(si, fi)
-                          } else if (activeStrings[si] && isRunning && mode === "locate") {
+                          } else if (activeStrings[si] && isRunning && mode === "locate" && !locateFeedback) {
                             toggleLocateNoteFret(si, fi)
                           } else if (isRunning && mode === "sweep" && !isSweepInactive) {
                             onSweepFretClick?.(si, fi)

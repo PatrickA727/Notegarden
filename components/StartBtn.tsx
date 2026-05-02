@@ -9,6 +9,7 @@ interface StartButtonProps {
   isRunning: boolean
   onToggle: (value: boolean) => void
   setHighlighted: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
+  activeStrings: boolean[]
   setActiveStrings: React.Dispatch<React.SetStateAction<boolean[]>>
   randomize: () => void
   position: string
@@ -17,14 +18,17 @@ interface StartButtonProps {
   startIdentifyTimer: () => void
 }
 
-const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings, randomize, position, sweepRandomize, collectorRandomize, startIdentifyTimer }: StartButtonProps) => {
+const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, activeStrings, setActiveStrings, randomize, position, sweepRandomize, collectorRandomize, startIdentifyTimer }: StartButtonProps) => {
+  const canStart = mode === "collector" || activeStrings.some(Boolean)
+
   useEffect(() => {
     if (isRunning && mode === "identify") {
       setHighlighted({ [position]: true });
     }
-  }, [position]);
+  }, [position, isRunning]);
 
   const handleToggle = () => {
+    if (!isRunning && !canStart) return
     setHighlighted({})
     const newIsRunning = !isRunning
     onToggle(newIsRunning)
@@ -46,11 +50,12 @@ const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings,
     <div className="pt-4">
       <Button
         onClick={handleToggle}
+        disabled={!isRunning && !canStart}
         className={`w-full font-semibold transition-colors duration-200 py-5 ${
           isRunning
             ? "bg-red-500 text-white hover:bg-red-600"
             : "bg-white text-zinc-900 hover:bg-zinc-200"
-        }`}
+        } disabled:opacity-40 disabled:cursor-not-allowed`}
       >
         {isRunning ? (
           <>
@@ -64,6 +69,11 @@ const StartBtn = ({ mode, isRunning, onToggle, setHighlighted, setActiveStrings,
           </>
         )}
       </Button>
+      {!isRunning && !canStart && (
+        <p className="text-zinc-500 text-xs text-center mt-2">
+          Enable at least one string to start
+        </p>
+      )}
     </div>
   )
 }

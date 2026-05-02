@@ -10,15 +10,22 @@ interface LocateNoteMainProps {
   weakness: WeaknessMap
   onAnswer: (isCorrect: boolean, key: string) => void
   onTimerRestart: () => void
+  onFeedbackChange: (active: boolean) => void
 }
 
-const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, weakness, onAnswer, onTimerRestart }: LocateNoteMainProps) => {
+const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, weakness, onAnswer, onTimerRestart, onFeedbackChange }: LocateNoteMainProps) => {
   const { note, string, key: targetKey, randomize } = useRandomNoteString(activeStrings, weakness);
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
 
   useEffect(() => {
     onTimerRestart();
   }, []);
+
+  useEffect(() => {
+    onFeedbackChange(result === 'incorrect');
+  }, [result]);
+
+  useEffect(() => () => onFeedbackChange(false), []);
 
   const handleEnter = () => {
     const clickedKey = Object.keys(highlighted)[0];
@@ -67,7 +74,7 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, weakness, 
         </div>
         <button
           onClick={handleEnter}
-          disabled={Object.keys(highlighted).length === 0}
+          disabled={Object.keys(highlighted).length === 0 || result !== null}
           className="text-zinc-400 hover:text-zinc-200 text-[12px] uppercase tracking-widest transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Enter

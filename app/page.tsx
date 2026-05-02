@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import HeroButtons from "@/components/HeroButtons"
 import Link from "next/link"
-import { Target, Eye, Zap, Music, BarChart3, Crosshair, Repeat, BarChart2, Clock, Flame, Map } from "lucide-react"
+import { Target, Eye, Zap, Music, BarChart3, Crosshair, Repeat, BarChart2, Clock, Flame, Map, Check } from "lucide-react"
 
 const modes = [
   {
@@ -99,7 +99,7 @@ export default function Home() {
           <span className="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-6">
             Guitar Fretboard Practice
           </span>
-          <h1 className="text-white text-5xl sm:text-6xl font-bold tracking-tight max-w-2xl leading-[1.1] mb-5">
+          <h1 className="text-white text-5xl sm:text-6xl font-bold tracking-wide max-w-2xl leading-[1.1] mb-5">
             Ready to master your fretboard?
           </h1>
           <p className="text-zinc-400 text-lg sm:text-xl max-w-lg leading-relaxed mb-10">
@@ -107,6 +107,10 @@ export default function Home() {
             note on the neck becomes second nature.
           </p>
           <HeroButtons />
+          <p className="flex items-center gap-2 text-sm text-zinc-500 mt-4">
+            <Check className="w-3.5 h-3.5 shrink-0" />
+            Best experienced with a guitar in hand
+          </p>
         </div>
       </section>
 
@@ -252,7 +256,7 @@ export default function Home() {
           }}
         />
         <div className="relative z-10">
-          <h2 className="text-white text-4xl sm:text-5xl font-bold tracking-tight mb-4 leading-tight">
+          <h2 className="text-white text-4xl sm:text-5xl font-bold tracking-wide mb-4 leading-tight">
             Your fretboard isn&apos;t going<br className="hidden sm:block" /> to memorize itself.
           </h2>
           <p className="text-zinc-400 text-base mb-8">Start drilling now — no account needed.</p>

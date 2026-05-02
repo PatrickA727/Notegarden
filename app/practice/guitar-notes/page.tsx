@@ -38,6 +38,7 @@ const GuitarNotes = () => {
   }
   const [highlighted, setHighlighted] = useState<Record<string, boolean>>({});
   const [activeStrings, setActiveStrings] = useState<boolean[]>(Array(6).fill(true));
+  const [locateFeedback, setLocateFeedback] = useState(false);
   const [identifyWeakness, setIdentifyWeakness] = useState<WeaknessMap>({})
   const [locateWeakness, setLocateWeakness] = useState<WeaknessMap>({})
   const [sweepWeakness, setSweepWeakness] = useState<WeaknessMap>({})
@@ -347,6 +348,7 @@ const GuitarNotes = () => {
                   isRunning={isRunning}
                   onToggle={handleToggleRunning}
                   setHighlighted={setHighlighted}
+                  activeStrings={activeStrings}
                   setActiveStrings={setActiveStrings}
                   randomize={randomize}
                   position={position}
@@ -379,6 +381,7 @@ const GuitarNotes = () => {
             onIdentifyTimerRestart={() => setIdentifyTimerStart(Date.now())}
             onLocateAnswer={handleLocateAnswer}
             onLocateTimerRestart={() => setLocateTimerStart(Date.now())}
+            onLocateFeedbackChange={setLocateFeedback}
             />
             <div className="pt-5">
               <Fretboard
@@ -393,6 +396,7 @@ const GuitarNotes = () => {
               sweepTargetSi={sweepTargetSi}
               onCollectorFretClick={handleCollectorFretClick}
               collectorFlashFret={collectorFlashFret}
+              locateFeedback={locateFeedback}
               identifyWeakness={identifyWeakness}
               locateWeakness={locateWeakness}
               sweepWeakness={sweepWeakness}

@@ -1,18 +1,12 @@
-import Image from "next/image"
+import IconFretGrid from "@/components/IconFretGrid"
 
 export default function Footer() {
   return (
     <footer className="bg-zinc-900 border-t border-zinc-800 px-7 py-8">
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
-          <Image
-            src="/nobg_note.png"
-            alt="Notegarden logo"
-            width={16}
-            height={16}
-            className="object-contain"
-          />
-          <span className="text-white font-semibold text-md">Notegarden</span>
+          <IconFretGrid size={41} />
+          <span className="text-white font-semibold text-[1.375rem] tracking-tight">Notegarden</span>
         </div>
 
         <div className="flex items-center gap-5 text-zinc-500 text-xs">
