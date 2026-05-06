@@ -12,4 +12,10 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
+  trustedOrigins: [process.env.NEXT_PUBLIC_BETTER_AUTH_URL!],
+  rateLimit: {
+    enabled: true,
+    window: 10,
+    max: 100,
+  },
 })

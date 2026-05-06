@@ -36,6 +36,15 @@ const bodySchema = z.object({
 })
 
 export async function POST(request: Request) {
+  // Defense-in-depth CSRF check on top of the SameSite=Lax session cookie.
+  // sendBeacon and fetch both send Origin on cross-origin POSTs; same-origin POSTs from
+  // modern browsers also include it. Reject if missing or not in the allowlist.
+  const origin = request.headers.get('origin')
+  const allowed = process.env.NEXT_PUBLIC_BETTER_AUTH_URL
+  if (!origin || !allowed || origin !== allowed) {
+    return new NextResponse('Forbidden', { status: 403 })
+  }
+
   const session = await getSession()
   if (!session) return new NextResponse('Unauthorized', { status: 401 })
   const userId = session.user.id
