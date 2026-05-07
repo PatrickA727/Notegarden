@@ -7,7 +7,13 @@ import { modeStats, weaknessBucket } from '@/db/schema'
 const NO_STORE = { 'Cache-Control': 'private, no-store', 'Vary': 'Cookie' }
 
 export async function GET() {
-  const session = await getSession()
+  let session: Awaited<ReturnType<typeof getSession>>
+  try {
+    session = await getSession()
+  } catch (err) {
+    console.error('[/api/me/state] getSession failed:', err)
+    return NextResponse.json({ error: 'internal' }, { status: 500, headers: NO_STORE })
+  }
   if (!session) return new NextResponse('Unauthorized', { status: 401, headers: NO_STORE })
 
   const userId = session.user.id
@@ -37,7 +43,8 @@ export async function GET() {
     ])
 
     return NextResponse.json({ modeStats: stats, weaknessBuckets: buckets }, { headers: NO_STORE })
-  } catch {
+  } catch (err) {
+    console.error('[/api/me/state] query failed:', { userId, err })
     return NextResponse.json({ error: 'internal' }, { status: 500, headers: NO_STORE })
   }
 }

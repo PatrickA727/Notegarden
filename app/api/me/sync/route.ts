@@ -32,7 +32,15 @@ const bodySchema = z.object({
       attempts: countInt,
       correct: countInt,
     }).refine(d => d.correct <= d.attempts, 'correct > attempts')
-  ).max(288),
+  ).max(288).refine(arr => {
+    const seen = new Set<string>()
+    for (const d of arr) {
+      const k = `${d.mode}|${d.key}`
+      if (seen.has(k)) return false
+      seen.add(k)
+    }
+    return true
+  }, 'duplicate (mode, key) in weaknessDeltas'),
 })
 
 export async function POST(request: Request) {
@@ -45,7 +53,13 @@ export async function POST(request: Request) {
     return new NextResponse('Forbidden', { status: 403 })
   }
 
-  const session = await getSession()
+  let session: Awaited<ReturnType<typeof getSession>>
+  try {
+    session = await getSession()
+  } catch (err) {
+    console.error('[/api/me/sync] getSession failed:', err)
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
+  }
   if (!session) return new NextResponse('Unauthorized', { status: 401 })
   const userId = session.user.id
 
@@ -123,7 +137,8 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ ok: true, ...(result.deduped && { deduped: true }) })
-  } catch {
+  } catch (err) {
+    console.error('[/api/me/sync] transaction failed:', { userId, requestId, err })
     return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }

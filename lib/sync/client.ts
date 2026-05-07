@@ -113,7 +113,5 @@ export function flushOnUnload(): void {
   const batch = drainPending()
   const requestId = crypto.randomUUID()
   const body = JSON.stringify({ requestId, modeDeltas: batch.mode, weaknessDeltas: batch.weakness })
-  // sendBeacon ignores the response — server is idempotent on requestId so a duplicate (if the
-  // periodic flush also lands) is safely deduped.
   navigator.sendBeacon('/api/me/sync', new Blob([body], { type: 'application/json' }))
 }
