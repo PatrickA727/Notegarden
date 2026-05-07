@@ -141,19 +141,53 @@ describe('POST /api/me/sync', () => {
       await POST(
         postJson({
           requestId: randomUUID(),
-          modeDeltas: [modeDelta({ attempts: 1, correct: 1, bestStreak: 5 })],
+          modeDeltas: [modeDelta({ attempts: 6, correct: 6, bestStreak: 5 })],
           weaknessDeltas: [],
         }),
       )
       await POST(
         postJson({
           requestId: randomUUID(),
-          modeDeltas: [modeDelta({ attempts: 1, correct: 1, bestStreak: 3 })],
+          modeDeltas: [modeDelta({ attempts: 6, correct: 6, bestStreak: 3 })],
           weaknessDeltas: [],
         }),
       )
 
       const row = await getModeRow(TEST_USER_A, 'identify')
+      expect(row.bestStreak).toBe(5)
+    })
+
+    it('clamps bestStreak to lifetime attempts on first insert (cheat resistance)', async () => {
+      setSessionUser(TEST_USER_A)
+      await POST(
+        postJson({
+          requestId: randomUUID(),
+          modeDeltas: [modeDelta({ attempts: 5, correct: 5, bestStreak: 100_000 })],
+          weaknessDeltas: [],
+        }),
+      )
+      const row = await getModeRow(TEST_USER_A, 'identify')
+      expect(row.bestStreak).toBe(5)
+    })
+
+    it('clamps bestStreak to lifetime attempts on UPSERT (cheat resistance)', async () => {
+      setSessionUser(TEST_USER_A)
+      await POST(
+        postJson({
+          requestId: randomUUID(),
+          modeDeltas: [modeDelta({ attempts: 3, correct: 3, bestStreak: 3 })],
+          weaknessDeltas: [],
+        }),
+      )
+      await POST(
+        postJson({
+          requestId: randomUUID(),
+          modeDeltas: [modeDelta({ attempts: 2, correct: 2, bestStreak: 100_000 })],
+          weaknessDeltas: [],
+        }),
+      )
+      const row = await getModeRow(TEST_USER_A, 'identify')
+      expect(row.attempts).toBe(5)
       expect(row.bestStreak).toBe(5)
     })
 

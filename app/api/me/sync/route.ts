@@ -77,7 +77,10 @@ export async function POST(request: Request) {
       if (inserted.length === 0) return { deduped: true }
 
       for (const d of modeDeltas) {
-        // First-time insert writes absolute values; subsequent calls add deltas / take MAX of bestStreak.
+        // bestStreak is a client-trusted absolute, so clamp it to the user's lifetime attempts
+        // — a real streak can never exceed the number of questions ever answered. Caps the
+        // worst-case cheat at "claim a streak equal to your real attempts," not the 100k Zod cap.
+        const insertBestStreak = Math.min(d.bestStreak, d.attempts)
         await tx.insert(modeStats).values({
           userId,
           mode: d.mode,
@@ -85,7 +88,7 @@ export async function POST(request: Request) {
           correct: d.correct,
           totalTimeMs: d.totalTimeMs,
           rounds: d.rounds,
-          bestStreak: d.bestStreak,
+          bestStreak: insertBestStreak,
         }).onConflictDoUpdate({
           target: [modeStats.userId, modeStats.mode],
           set: {
@@ -93,7 +96,7 @@ export async function POST(request: Request) {
             correct:     sql`${modeStats.correct}     + ${d.correct}`,
             totalTimeMs: sql`${modeStats.totalTimeMs} + ${d.totalTimeMs}`,
             rounds:      sql`${modeStats.rounds}      + ${d.rounds}`,
-            bestStreak:  sql`GREATEST(${modeStats.bestStreak}, ${d.bestStreak})`,
+            bestStreak:  sql`LEAST(GREATEST(${modeStats.bestStreak}, ${d.bestStreak}), ${modeStats.attempts} + ${d.attempts})`,
             updatedAt:   sql`now()`,
           },
         })

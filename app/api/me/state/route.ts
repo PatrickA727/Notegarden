@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 import { getSession } from '@/lib/session'
 import { modeStats, weaknessBucket } from '@/db/schema'
 
-const NO_STORE = { 'Cache-Control': 'private, no-store' }
+const NO_STORE = { 'Cache-Control': 'private, no-store', 'Vary': 'Cookie' }
 
 export async function GET() {
   const session = await getSession()
