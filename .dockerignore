@@ -1,0 +1,43 @@
+node_modules
+.next
+.git
+.gitignore
+
+# env files: never copied into the image; supplied at runtime via env_file
+.env
+.env.*
+!.env.production.example
+
+# tests / coverage / docs / IDE
+coverage
+tests
+docs
+README.md
+CLAUDE.md
+.vscode
+.idea
+.claude
+.agents
+.github
+
+# build artifacts and logs
+dist
+build
+out
+*.log
+npm-debug.log*
+.pnpm-debug.log*
+
+# typescript transient
+*.tsbuildinfo
+next-env.d.ts
+
+# OS
+.DS_Store
+Thumbs.db
+
+# vercel / docker meta
+.vercel
+docker-compose*.yml
+Dockerfile*
+.dockerignore

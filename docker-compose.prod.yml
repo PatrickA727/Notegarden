@@ -1,0 +1,59 @@
+# Deploy:
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+# Apply schema migrations (after first boot or after schema changes):
+#   docker compose -f docker-compose.prod.yml --env-file .env.production exec app node scripts/migrate.mjs
+
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* vars are inlined into the client JS bundle at build
+        # time, so they must be passed as a build arg (env_file alone is not
+        # enough — it only injects vars at container runtime).
+        NEXT_PUBLIC_BETTER_AUTH_URL: ${NEXT_PUBLIC_BETTER_AUTH_URL}
+    image: notegarden-app:latest
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    ports:
+      # Bind to loopback only; host nginx is the public entry point.
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - notegarden-net
+    security_opt:
+      - no-new-privileges:true
+
+  db:
+    image: postgres:16.6-alpine
+    restart: unless-stopped
+    # Postgres image initializes the user/db on first boot from these vars.
+    # Keep them in sync with the credentials embedded in DATABASE_URL.
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - notegarden-pgdata:/var/lib/postgresql/data
+    networks:
+      - notegarden-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  notegarden-net:
+    driver: bridge
+
+volumes:
+  notegarden-pgdata:

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:push:test": "node scripts/db-push-test.mjs"
+    "db:push:test": "node scripts/db-push-test.mjs",
+    "db:migrate": "node scripts/migrate.mjs"
   },
   "dependencies": {
     "better-auth": "^1.6.8",
@@ -28,7 +29,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@rolldown/binding-win32-x64-msvc": "^1.0.0-rc.18",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
