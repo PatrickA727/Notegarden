@@ -1,8 +1,38 @@
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import HeroButtons from "@/components/HeroButtons"
-import Link from "next/link"
 import { Target, Eye, Zap, Music, BarChart3, Crosshair, Repeat, BarChart2, Clock, Flame, Map, Check } from "lucide-react"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: { absolute: "Notegarden — Guitar Fretboard Trainer" },
+  description:
+    "Drill guitar fretboard notes with adaptive practice. Four modes, real-time accuracy tracking, weakness-targeting algorithm. Free in your browser.",
+  alternates: { canonical: "/" },
+}
+
+const faqItems = [
+  {
+    q: "Is Notegarden free?",
+    a: "Yes. Every practice mode is free with no trial limit. Signing in is optional and only used to save your progress across devices.",
+  },
+  {
+    q: "Do I need an account to practice?",
+    a: "No. You can use all four drill modes as a guest. An account is only needed if you want your stats and weakness map persisted between sessions.",
+  },
+  {
+    q: "How long does it take to memorize the guitar fretboard?",
+    a: "Most guitarists reach reliable note recall within a few weeks of short daily sessions. Notegarden's adaptive drills speed that up by spending more reps on the notes you miss most.",
+  },
+  {
+    q: "What are the four practice modes?",
+    a: "Identify (name a highlighted fret), Locate (find a named note on a given string), Sweep (five notes in order on one string), and Collector (find a single note on every string).",
+  },
+  {
+    q: "What does it track?",
+    a: "Per-mode accuracy, average response time, current and best streaks, and a 72-position fretboard heatmap so you can see exactly where you're weakest.",
+  },
+]
 
 const modes = [
   {
@@ -54,8 +84,43 @@ const adaptiveFeatures = [
 ]
 
 export default function Home() {
+  const siteUrl = "https://notegardenmusic.com"
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        name: "Notegarden",
+        applicationCategory: "EducationalApplication",
+        operatingSystem: "Web",
+        url: siteUrl + "/",
+        description:
+          "Adaptive guitar fretboard trainer with four practice modes and weakness-targeting drills.",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      },
+      {
+        "@type": "Organization",
+        name: "Notegarden",
+        url: siteUrl + "/",
+        logo: siteUrl + "/icon.svg",
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faqItems.map(({ q, a }) => ({
+          "@type": "Question",
+          name: q,
+          acceptedAnswer: { "@type": "Answer", text: a },
+        })),
+      },
+    ],
+  }
+
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
 
       {/* Hero */}
@@ -236,6 +301,61 @@ export default function Home() {
           <p className="mt-10 text-zinc-600 text-xs">
             Sign in to save your stats and pick up where you left off.
           </p>
+        </div>
+      </section>
+
+      {/* Why memorize the fretboard? — SEO copy */}
+      <section className="px-6 py-20">
+        <div className="max-w-3xl mx-auto">
+          <span className="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-4 block text-center">
+            Fretboard Fundamentals
+          </span>
+          <h2 className="text-white text-3xl sm:text-4xl font-bold tracking-tight mb-6 text-center">
+            Why memorize the fretboard?
+          </h2>
+          <div className="space-y-5 text-zinc-400 text-base leading-relaxed">
+            <p>
+              Knowing every note on the guitar neck is the bridge between playing tabs and
+              actually understanding what you&apos;re playing. It&apos;s what lets you read sheet
+              music, build chords from intervals, improvise inside a key, and communicate with
+              other musicians — all without pausing to count frets.
+            </p>
+            <p>
+              Most players never get there because rote repetition is slow and unfocused.
+              Notegarden fixes that with a weakness-targeting algorithm: every position on the
+              neck has its own accuracy bucket, and the drill biases toward the notes you keep
+              missing. Short, focused sessions beat long, scattered ones — five minutes a day
+              for a few weeks is usually enough to feel a real difference.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="px-6 py-20 border-y border-zinc-800 bg-zinc-900/40">
+        <div className="max-w-3xl mx-auto">
+          <span className="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-4 block text-center">
+            FAQ
+          </span>
+          <h2 className="text-white text-3xl sm:text-4xl font-bold tracking-tight mb-10 text-center">
+            Frequently asked questions
+          </h2>
+          <div className="space-y-3">
+            {faqItems.map(({ q, a }) => (
+              <details
+                key={q}
+                className="group bg-zinc-900 border border-zinc-800 rounded-2xl px-5 py-4 open:border-zinc-700 transition-colors"
+              >
+                <summary className="cursor-pointer list-none flex items-center justify-between gap-4 text-white font-medium text-sm">
+                  <span>{q}</span>
+                  <span className="text-zinc-500 text-lg leading-none transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-zinc-400 text-sm leading-relaxed">{a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
