@@ -22,7 +22,7 @@ const faqItems = [
   },
   {
     q: "How long does it take to memorize the guitar fretboard?",
-    a: "Most guitarists reach reliable note recall within a few weeks of short daily sessions. Notegarden's adaptive drills speed that up by spending more reps on the notes you miss most.",
+    a: "Most guitarists reach reliable note recall within a few weeks of short daily sessions. Notegarden's adaptive drills speed that up by spending more reps on the notes you miss most, this increases significantly if you accompany your practice sessions with a guitar in hand.",
   },
   {
     q: "What are the four practice modes?",
@@ -321,10 +321,10 @@ export default function Home() {
               other musicians — all without pausing to count frets.
             </p>
             <p>
-              Most players never get there because rote repetition is slow and unfocused.
-              Notegarden fixes that with a weakness-targeting algorithm: every position on the
-              neck has its own accuracy bucket, and the drill biases toward the notes you keep
-              missing. Short, focused sessions beat long, scattered ones — five minutes a day
+              Most players never get there because note repetition is slow and unfocused.
+              Notegarden fixes that with a weakness-targeting algorithm, every position on the
+              neck has its own accuracy tracker, and the drill biases toward the notes you are weak at. 
+              Short, focused sessions beat long, scattered ones — ten minutes a day
               for a few weeks is usually enough to feel a real difference.
             </p>
           </div>
