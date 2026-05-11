@@ -27,7 +27,7 @@ const NoteRecogMain = ({ note, randomize, onAnswer, onTimerRestart }: NoteRecogP
   const noteDisplay = flat ? `${note}/${flat}` : note;
 
     return (
-        <div className="bg-zinc-800 border border-zinc-700 rounded-lg py-6 px-12">
+        <div className="bg-zinc-800 border border-zinc-700 rounded-lg py-6 px-4 lg:px-12">
             <p className="text-zinc-400 text-[13px] uppercase tracking-widest mb-4">
             What note is this?
             </p>

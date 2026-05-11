@@ -57,7 +57,7 @@ export default function NavbarAuth() {
     return (
       <button
         onClick={handleSignIn}
-        className="group bg-zinc-50 text-zinc-900 text-sm font-semibold px-5 py-2 rounded-full hover:bg-zinc-200 active:scale-95 transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5"
+        className="group bg-zinc-50 text-zinc-900 text-sm font-semibold px-4 sm:px-5 py-2 rounded-full hover:bg-zinc-200 active:scale-95 transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5 whitespace-nowrap"
         type="button"
       >
         <span>Save Progress</span>
@@ -69,7 +69,7 @@ export default function NavbarAuth() {
   return (
     <button
       onClick={handleSignIn}
-      className="border border-zinc-700 text-zinc-300 text-sm font-medium px-5 py-2 rounded-full hover:border-zinc-500 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer"
+      className="border border-zinc-700 text-zinc-300 text-sm font-medium px-4 sm:px-5 py-2 rounded-full hover:border-zinc-500 hover:text-white active:scale-95 transition-all duration-200 cursor-pointer whitespace-nowrap"
       type="button"
     >
       Sign In

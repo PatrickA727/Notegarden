@@ -53,30 +53,32 @@ const Modes = ({ onModeChange, isRunning }: ModeSelectorProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-3 px-4">
-      <h2 className="text-zinc-300 text-sm font-semibold uppercase tracking-widest mb-1 px-1">
+    <div className="flex flex-col gap-3 px-1 lg:px-4">
+      <h2 className="text-zinc-300 text-sm font-semibold uppercase tracking-widest mb-2 lg:mb-1 px-1">
         Practice Mode
       </h2>
-      {modes.map((mode) => (
-        <button
-          key={mode.id}
-          onClick={() => handleSelect(mode.id)}
-          disabled={isRunning === true}
-          className={`flex items-center gap-4 w-full px-4 py-3 rounded-lg border transition-all duration-200 text-left disabled:opacity-70
-            ${selected === mode.id
-              ? "bg-zinc-700 border-zinc-500 text-white"
-              : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-750 hover:text-zinc-200 hover:border-zinc-600"
-            }`}
-        >
-          <div className={`shrink-0 ${selected === mode.id ? "text-white" : "text-zinc-500"}`}>
-            {mode.icon}
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">{mode.title}</span>
-            <span className="text-xs text-zinc-500">{mode.description}</span>
-          </div>
-        </button>
-      ))}
+      <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-col lg:gap-3">
+        {modes.map((mode) => (
+          <button
+            key={mode.id}
+            onClick={() => handleSelect(mode.id)}
+            disabled={isRunning === true}
+            className={`flex items-center gap-3 lg:gap-4 w-full px-3 py-2.5 lg:px-4 lg:py-3 rounded-lg border transition-all duration-200 text-left disabled:opacity-70
+              ${selected === mode.id
+                ? "bg-zinc-700 border-zinc-500 text-white"
+                : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:bg-zinc-750 hover:text-zinc-200 hover:border-zinc-600"
+              }`}
+          >
+            <div className={`shrink-0 ${selected === mode.id ? "text-white" : "text-zinc-500"}`}>
+              {mode.icon}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-medium truncate">{mode.title}</span>
+              <span className="hidden lg:block text-xs text-zinc-500">{mode.description}</span>
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

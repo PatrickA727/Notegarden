@@ -83,7 +83,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
   };
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 font-mono select-none">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-2 sm:p-3 lg:p-4 font-mono select-none">
       {!isRunning && (
         <div className="flex justify-start mb-2">
           <button
@@ -98,7 +98,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
           </button>
         </div>
       )}
-      <div className="flex items-stretch gap-2.5">
+      <div className="flex items-stretch gap-1.5 sm:gap-2.5">
 
         {/* String Toggles */}
         <div className="flex flex-col justify-around pt-[22px] pb-5">
@@ -106,7 +106,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
             <button
               key={si}
               onClick={() => toggleString(si)}
-              className={`w-[26px] h-[26px] rounded-md border flex items-center justify-center transition-all ${ // Dynamic css
+              className={`w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-md border flex items-center justify-center transition-all ${ // Dynamic css
                 isRunning
                   ? "bg-zinc-500 border-zinc-700 opacity-40 cursor-not-allowed"
                   : activeStrings[si]
@@ -128,7 +128,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
 
           {/* Fret numbers */}
           <div className="flex mb-[5px]">
-            <div className="w-[18px] shrink-0" />
+            <div className="w-[14px] sm:w-[18px] shrink-0" />
             {Array.from({ length: FRET_COUNT }, (_, i) => (
               <div key={i} className="flex-1 text-center text-[10px] text-zinc-500">
                 {i + 1}
@@ -144,10 +144,10 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
               return (
                 <div
                   key={si}
-                  className={`flex items-center h-[38px] ${si < 5 ? "border-b border-[#292524]" : ""} ${isSweepInactive ? "opacity-30" : ""}`}
+                  className={`flex items-center h-[44px] sm:h-[38px] ${si < 5 ? "border-b border-[#292524]" : ""} ${isSweepInactive ? "opacity-30" : ""}`}
                 >
                   {/* Nut */}
-                  <div className="w-[18px] h-full bg-zinc-700 border-r-[3px] border-zinc-400 flex items-center justify-center shrink-0">
+                  <div className="w-[14px] sm:w-[18px] h-full bg-zinc-700 border-r-[3px] border-zinc-400 flex items-center justify-center shrink-0">
                     <span className="text-[9px] text-zinc-400 font-semibold">{name}</span>
                   </div>
 
@@ -195,7 +195,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                         {/* Note highlight */}
                         {isLit && (
                           <div
-                            className="w-[26px] h-[26px] rounded-full bg-zinc-50 border border-zinc-300 flex items-center justify-center text-[10px] font-bold text-zinc-900 relative z-20"
+                            className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full bg-zinc-50 border border-zinc-300 flex items-center justify-center text-[10px] font-bold text-zinc-900 relative z-20"
                             style={{ animation: "fbpop .14s ease" }}
                           >
                             {NOTES_FROM_OPEN[si][fi]}
@@ -205,7 +205,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                         {/* Note recognition mode */}
                         {isRunning && mode === "identify" && !!highlighted[key] && isActive && (
                           <div
-                            className="w-[26px] h-[26px] rounded-full bg-zinc-50 border border-zinc-300 flex items-center justify-center text-[10px] font-bold text-zinc-900 relative z-20"
+                            className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full bg-zinc-50 border border-zinc-300 flex items-center justify-center text-[10px] font-bold text-zinc-900 relative z-20"
                             style={{ animation: "fbpop .14s ease" }}
                           >
                           </div>
@@ -214,7 +214,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                         {/* Locate mode */}
                         {isRunning && mode === "locate" && !!highlighted[key] && isActive && (
                           <div
-                            className="w-[26px] h-[26px] rounded-full bg-zinc-50 border border-zinc-300 flex items-center justify-center text-[10px] font-bold text-zinc-900 relative z-20"
+                            className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full bg-zinc-50 border border-zinc-300 flex items-center justify-center text-[10px] font-bold text-zinc-900 relative z-20"
                             style={{ animation: "fbpop .14s ease" }}
                           >
                           </div>
@@ -223,7 +223,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                         {/* Sweep mode flash */}
                         {isRunning && mode === "sweep" && flashFret?.key === key && (
                           <div
-                            className={`w-[26px] h-[26px] rounded-full flex items-center justify-center text-[10px] font-bold relative z-20 ${
+                            className={`w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full flex items-center justify-center text-[10px] font-bold relative z-20 ${
                               flashFret.correct ? "bg-emerald-400 text-emerald-900" : "bg-red-400 text-red-900"
                             }`}
                             style={{ animation: "fbpop .14s ease" }}
@@ -233,7 +233,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                         {/* Collector mode flash */}
                         {isRunning && mode === "collector" && collectorFlashFret?.key === key && (
                           <div
-                            className={`w-[26px] h-[26px] rounded-full flex items-center justify-center text-[10px] font-bold relative z-20 ${
+                            className={`w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full flex items-center justify-center text-[10px] font-bold relative z-20 ${
                               collectorFlashFret.correct ? "bg-emerald-400 text-emerald-900" : "bg-red-400 text-red-900"
                             }`}
                             style={{ animation: "fbpop .14s ease" }}
@@ -248,7 +248,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
                             : null
                           return (
                             <div
-                              className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[9px] font-bold relative z-20"
+                              className="w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full flex items-center justify-center text-[9px] font-bold relative z-20"
                               style={{
                                 backgroundColor: pct !== null ? getHeatmapColor(pct) : '#52525b',
                                 opacity: pct !== null ? 0.85 : 0.4,
@@ -269,7 +269,7 @@ const Fretboard = ({ mode, isRunning, highlighted, setHighlighted, activeStrings
 
           {/* Position dots row */}
           <div className="flex h-4 bg-[#1c1917] border border-[#292524] border-t-zinc-700 rounded-b">
-            <div className="w-[18px] shrink-0 border-r-[3px] border-zinc-400" />
+            <div className="w-[14px] sm:w-[18px] shrink-0 border-r-[3px] border-zinc-400" />
             {Array.from({ length: FRET_COUNT }, (_, i) => {
               const fi = i + 1;
               return (

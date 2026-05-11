@@ -56,17 +56,17 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, weakness, 
   }
 
   return (
-    <div className="bg-zinc-800 border border-zinc-700 rounded-lg py-6 px-12">
+    <div className="bg-zinc-800 border border-zinc-700 rounded-lg py-6 px-4 lg:px-12">
       <p className="text-zinc-500 text-[13px] uppercase tracking-widest mb-4">
         Find this note
       </p>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-6">
+      <div className="flex flex-col items-stretch gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-0">
+        <div className="flex items-center gap-4 lg:gap-6">
           <div>
             <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">String</p>
             <p className="text-white text-3xl font-semibold">{string}</p>
           </div>
-          <div className="w-px h-14 bg-zinc-700" />
+          <div className="hidden lg:block w-px h-14 bg-zinc-700" />
           <div>
             <p className="text-zinc-500 text-[11px] uppercase tracking-widest mb-1">Note</p>
             <p className="text-white text-3xl font-semibold">{note}</p>
@@ -75,7 +75,7 @@ const LocateNoteMain = ({ highlighted, setHighlighted, activeStrings, weakness, 
         <button
           onClick={handleEnter}
           disabled={Object.keys(highlighted).length === 0 || result !== null}
-          className="text-zinc-400 hover:text-zinc-200 text-[12px] uppercase tracking-widest transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-full lg:w-auto text-zinc-400 hover:text-zinc-200 text-[12px] uppercase tracking-widest transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed border lg:border-0 border-zinc-700 hover:border-zinc-500 rounded-md py-2 lg:py-0 lg:rounded-none"
         >
           Enter
         </button>

@@ -338,11 +338,11 @@ const GuitarNotes = () => {
   return (
     <div>
         <Navbar></Navbar>
-        <div className="flex h-screen pt-5">
-          <aside className="w-80 bg-zinc-950 text-white flex items-start justify-center pt-20">
-            <div className="w-77">
+        <div className="flex flex-col lg:flex-row lg:h-screen pt-4 lg:pt-5 gap-4 lg:gap-0">
+          <aside className="w-full lg:w-80 bg-zinc-950 text-white flex items-start justify-center px-4 lg:px-0 pt-2 lg:pt-20">
+            <div className="w-full lg:w-77">
               <Modes onModeChange={setActiveMode} isRunning={isRunning} />
-                <div className="px-4">
+                <div className="px-1 lg:px-4">
                   <StartBtn
                   mode={activeMode}
                   isRunning={isRunning}
@@ -360,7 +360,7 @@ const GuitarNotes = () => {
             </div>
           </aside>
 
-          <main className="flex-1 bg-zinc-950 text-white pt-20 text-center">
+          <main className="flex-1 bg-zinc-950 text-white px-4 lg:px-0 pt-2 lg:pt-20 text-center">
             <MainBar
             mode={activeMode}
             isRunning={isRunning}
@@ -383,7 +383,7 @@ const GuitarNotes = () => {
             onLocateTimerRestart={() => setLocateTimerStart(Date.now())}
             onLocateFeedbackChange={setLocateFeedback}
             />
-            <div className="pt-5">
+            <div className="pt-4 lg:pt-5">
               <Fretboard
               mode={activeMode}
               isRunning={isRunning}
@@ -405,8 +405,8 @@ const GuitarNotes = () => {
             </div>
           </main>
 
-          <aside className="w-80 bg-zinc-950 text-white flex justify-center pt-20">
-            <div className="w-70">
+          <aside className="w-full lg:w-80 bg-zinc-950 text-white flex justify-center px-4 lg:px-0 pt-2 lg:pt-20 pb-16 lg:pb-0">
+            <div className="w-full lg:w-70">
               <Statistics
               activeMode={activeMode}
               identifyAttempts={identifyAttempts}
