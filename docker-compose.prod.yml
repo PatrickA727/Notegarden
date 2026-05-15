@@ -1,29 +1,46 @@
 # Deploy:
-#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+#   docker compose -f docker-compose.prod.yml --env-file .env.production pull
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d
 # Apply schema migrations (after first boot or after schema changes):
 #   docker compose -f docker-compose.prod.yml --env-file .env.production exec app node scripts/migrate.mjs
+#
+# The app image is built off-VPS by GitHub Actions (.github/workflows/build.yml)
+# and published to GHCR. Set APP_IMAGE in .env.production to the GHCR path,
+# pinning either `:latest` or a specific commit SHA for rollbacks.
 
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        # NEXT_PUBLIC_* vars are inlined into the client JS bundle at build
-        # time, so they must be passed as a build arg (env_file alone is not
-        # enough — it only injects vars at container runtime).
-        NEXT_PUBLIC_BETTER_AUTH_URL: ${NEXT_PUBLIC_BETTER_AUTH_URL}
-    image: notegarden-app:latest
+    image: ${APP_IMAGE}
     restart: unless-stopped
     env_file:
       - .env.production
-    ports:
-      # Bind to loopback only; host nginx is the public entry point.
-      - "127.0.0.1:3000:3000"
+    expose:
+      - "3000"
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - notegarden-net
+    security_opt:
+      - no-new-privileges:true
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data       # LE certs + ACME state — back this up
+      - caddy-config:/config
+    depends_on:
+      - app
     networks:
       - notegarden-net
     security_opt:
@@ -51,9 +68,47 @@ services:
     security_opt:
       - no-new-privileges:true
 
+  # Lightweight cron container — reuses the postgres-alpine image so it has
+  # psql, pg_dump, and gzip available.
+  # Schedules use UTC. Adjust via TZ if you want local-time scheduling.
+  cron:
+    image: postgres:16.6-alpine
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-7}
+    volumes:
+      - ./scripts/cron-tasks.sh:/cron-tasks.sh:ro
+      - notegarden-backups:/backups
+    networks:
+      - notegarden-net
+    # Inline crontab + run busybox crond in the foreground.
+    # Per-job output redirected to PID 1's stdout so docker logs captures it.
+    command:
+      - sh
+      - -c
+      - |
+        chmod +x /cron-tasks.sh
+        cat > /etc/crontabs/root <<'EOF'
+        0 2 * * * /cron-tasks.sh gc-sync-request >> /proc/1/fd/1 2>&1
+        0 3 * * * /cron-tasks.sh backup-db >> /proc/1/fd/1 2>&1
+        EOF
+        exec crond -f -l 2 -L /dev/stdout
+    security_opt:
+      - no-new-privileges:true
+
 networks:
   notegarden-net:
     driver: bridge
 
 volumes:
   notegarden-pgdata:
+  notegarden-backups:
+  caddy-data:
+  caddy-config:
