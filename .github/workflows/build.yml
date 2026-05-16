@@ -1,9 +1,11 @@
-name: Build and push image
+name: Test, build, and push image
 
-# Builds the app's Docker image on every push to main and publishes it to
-# GitHub Container Registry. The VPS pulls from GHCR — deploy is just
-# `docker compose pull && docker compose up -d` over there.
+# Two-stage pipeline on every push to main:
+#   1. test  — Vitest suite against an ephemeral Postgres service container.
+#   2. build — only runs if test passed; builds the Docker image and pushes
+#              to GHCR with tags :latest and :<full-sha>.
 #
+# Tests block the image push, so a broken endpoint can never reach the VPS.
 # workflow_dispatch is enabled so you can rebuild without a code change
 # (useful when the upstream node:24-alpine base image gets a security update).
 
@@ -17,7 +19,58 @@ env:
   IMAGE_NAME: ${{ github.repository }}   # owner/repo, lowercased by docker/metadata-action
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # Ephemeral Postgres for the test suite. Container is destroyed when
+    # the job ends — no cleanup needed. Healthcheck gates job start.
+    services:
+      postgres:
+        image: postgres:16.6-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: notegarden_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - run: npm ci --no-audit --no-fund
+
+      # Materialise the .env.test the test scripts expect. Auth vars are
+      # dummies because tests/setup.ts mocks lib/session — the real auth code
+      # is never executed. DB creds match the postgres service container.
+      - name: Create .env.test
+        run: |
+          cat > .env.test <<'EOF'
+          DATABASE_URL=postgres://test:test@localhost:5432/notegarden_test
+          DATABASE_SSL=false
+          BETTER_AUTH_SECRET=dummy-ci-secret-not-used
+          NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:3000
+          GOOGLE_CLIENT_ID=dummy
+          GOOGLE_CLIENT_SECRET=dummy
+          EOF
+
+      - name: Push schema to test DB
+        run: npm run db:push:test
+
+      - name: Run Vitest
+        run: npm test
+
   build:
+    needs: test           # blocks image push until tests pass
     runs-on: ubuntu-latest
     permissions:
       contents: read       # checkout
