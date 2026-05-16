@@ -90,11 +90,13 @@ services:
       - notegarden-net
     # Inline crontab + run busybox crond in the foreground.
     # Per-job output redirected to PID 1's stdout so docker logs captures it.
+    # The script's executable bit must be set on the host (the bind mount is
+    # :ro and `chmod` here would no-op). On Windows hosts run
+    # `git update-index --chmod=+x scripts/cron-tasks.sh` once and commit.
     command:
       - sh
       - -c
       - |
-        chmod +x /cron-tasks.sh
         cat > /etc/crontabs/root <<'EOF'
         0 2 * * * /cron-tasks.sh gc-sync-request >> /proc/1/fd/1 2>&1
         0 3 * * * /cron-tasks.sh backup-db >> /proc/1/fd/1 2>&1
